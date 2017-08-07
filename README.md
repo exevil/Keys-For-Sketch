@@ -25,15 +25,26 @@ Keys installation is way the same as any other plugin but it requires you to res
 * Single-character shortcuts customization (like Pencil or Vector tool) 
 * Shortcut conflicts resolving
 * Support of any third-party plugins
-* Support of System Preferences custom shortcuts
 * Preferences window integration
 * Intuitive lightning fast UI
-* Support of the modern Sketch v45 Plugin Updating System
+* Supporting of the modern Sketch v45 Plugin Updating System
 
 ## FAQ
-**Should I remove custom shortcuts set in System Preferences and remap it through Keys?**
+**Where can I see the changelog?**
 <br />
-Nope. Keys should automatically catch values you set in System Preferences. Moreover after you set a custom shortcut with Keys you can always roll back to value defined in System Preferences through shortcut actions menu (▾).
+On the [Releases](https://github.com/exevil/Keys-For-Sketch/releases) page.
+
+**How to restore default Sketch shortcuts?**
+<br />
+Use «Restore Default Shortcuts...» command from plugin menu. *It should remove any user shortcut data includinge one that defined directly in System Preferences.*
+
+**How Keys will affect a custom shortcuts I defined earlier in System Preferences?**
+<br />
+Since Keys are using default system storage for shortcuts it shouldn't affect without additional user actions like «Restore Default Shortcuts...» command from plugin menu.
+
+**Can't see my Keys shortcuts in System Preferences. Is something wrong?**
+<br />
+Since System Preferences caches shortcut values from storage once upon startup you need to completely relaunch it to get updated shortcut data there.
 
 **My issue isn't listed here. What now?**
 <br />
