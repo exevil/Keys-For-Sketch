@@ -30,7 +30,7 @@ Keys installation is way the same as any other plugin but it requires you to res
 * Supporting of the modern Sketch v45 Plugin Updating System
 
 ## FAQ
-##### Where can I see the changelog?
+#### Where can I see the changelog?
 On the [Releases](https://github.com/exevil/Keys-For-Sketch/releases) page.
 
 #### How to restore default Sketch shortcuts?
