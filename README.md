@@ -22,7 +22,7 @@ Keys installation is way the same as any other plugin but it requires you to res
 
 ## Features
 * Easy menu shortcuts customization
-* Single-character shortcuts customization (like Pencil or Vector tool) 
+* Single-character shortcuts customization (like Pencil or Vector) 
 * Shortcut conflicts resolving
 * Support of any third-party plugins
 * Preferences window integration
@@ -41,6 +41,12 @@ Since Keys are using default system storage for shortcuts it shouldn't affect wi
 
 #### — Can't see my Keys shortcuts in System Preferences. Is something wrong?
 Since System Preferences caches shortcut values from storage once upon startup you need to completely relaunch it to get updated shortcut data there.
+
+#### — What happens with my custom shortcuts if I remove Keys?
+Nothing because all your shortcuts were defined in System Preferences.
+
+#### — I removed Keys and my custom shortcuts manually from System Preferences, but tools with single-character shortcuts (like Pencil or Vector) are still using previously defined values. How to reset it to defaults too?
+Since Sketch manages single character shortcuts by itself, you should delete keyBindings.plist from ~/Library/Application Support/com.bohemiancoding.sketch3/ folder and restart Sketch to return default tools shortcuts.
 
 #### — My issue isn't listed here. What now?
 Please check the [open issues list](https://github.com/exevil/Keys-For-Sketch/issues) and feel free to create a new one if you don't see your problem there.
