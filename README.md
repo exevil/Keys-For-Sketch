@@ -12,6 +12,7 @@ Keys is a full-featured shortcut manager for Sketch. Integrated directly to Pref
 
 1. [Installation](#installation)
 1. [Features](#features)
+1. [Usage](#usage)
 1. [FAQ](#faq)
 1. [Support Project](#support-project)
 
@@ -28,6 +29,15 @@ Keys installation is way the same as any other plugins.
 * Preferences window integration
 * Intuitive lightning-fast UI
 * Modern Sketch v45 plugin updating system support
+
+## Usage
+1. Open Sketch Preferences (⌘+,)
+1. Select `Keys` tab
+1. Choose menu item for shortcut redefinition
+1. Click on its shortcut or on `...` on the right side
+1. Press new short 
+1. Resolve conflicts if needed
+1. Enjoy
 
 ## FAQ
 #### — Where can I see the changelog?
