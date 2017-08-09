@@ -46,7 +46,7 @@ Since System Preferences caches shortcut values from storage once upon startup y
 Nothing because all your shortcuts were defined in System Preferences.
 
 #### — I removed Keys and my custom shortcuts manually from System Preferences, but tools with single-character shortcuts (like Pencil or Vector) are still using previously defined values. How to reset it to defaults too?
-Since Sketch manages single character shortcuts by itself, you should delete keyBindings.plist from ~/Library/Application Support/com.bohemiancoding.sketch3/ folder and restart Sketch to return default tools shortcuts.
+Since Sketch manages single character shortcuts by itself, you should delete `keyBindings.plist` from `~/Library/Application Support/com.bohemiancoding.sketch3/` folder and restart Sketch to return default tools shortcuts.
 
 #### — My issue isn't listed here. What now?
 Please check the [open issues list](https://github.com/exevil/Keys-For-Sketch/issues) and feel free to create a new one if you don't see your problem there.
