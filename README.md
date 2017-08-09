@@ -16,18 +16,18 @@ Keys is a full-featured shortcut manager for Sketch. Integrated directly to Pref
 1. [Support Project](#support-project)
 
 ## Installation
-Keys installation is way the same as any other plugin but it requires you to restart Sketch afterwards.
+Keys installation is way the same as any other plugins.
 
 [![](https://d26dzxoao6i3hh.cloudfront.net/items/0x1V0z2p0P29120B170h/Group%207.svg)](https://github.com/exevil/Keys-For-Sketch/releases/latest)
 
 ## Features
-* Easy menu shortcuts customization
+* Easily menu shortcuts customization
 * Single-character shortcuts customization (like Pencil or Vector) 
 * Shortcut conflicts resolving
-* Support of any third-party plugins
+* Any third-party plugins support
 * Preferences window integration
-* Intuitive lightning fast UI
-* Supporting of the modern Sketch v45 Plugin Updating System
+* Intuitive lightning-fast UI
+* Modern Sketch v45 plugin updating system support
 
 ## FAQ
 #### — Where can I see the changelog?
