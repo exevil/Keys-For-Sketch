@@ -52,6 +52,6 @@ Since Sketch manages single character shortcuts by itself, you should delete `ke
 Please check the [open issues list](https://github.com/exevil/Keys-For-Sketch/issues) and feel free to create a new one if you don't see your problem there.
 
 ## Support Project
-I spent almost all my free time for last months to make this project real so any donation or feedback is really matters. It's nice to see that things you do are really make people lives easier.
+I spent a lot of time to make this project real so any feedback or donation is really matters. It's wonderful to see that things you do are really making people's lives easier.
 
 [![](https://d26dzxoao6i3hh.cloudfront.net/items/3N0T3k1i3k2X3Z3f2g3v/Group%209.svg)](https://www.paypal.me/exevil/5)
