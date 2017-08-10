@@ -1,0 +1,20 @@
+{
+    "identifier" : "com.vyacheslav-dubovitsky.KeysForSketch",
+    "name" : "Keys For Sketch",
+    "author" : "Vyacheslav Dubovitsky",
+    "homepage" : "https://github.com/exevil/Keys-For-Sketch/releases",
+    "appcast" : "https://appcastupdater.herokuapp.com/keys/appcast.xml",
+    "version" : "0.7",
+    "description" : "Advanced shortcut manager for Sketch",
+    "authorEmail" : "m@dbv.ae",
+    "commands" : [
+    {
+        "script":"script.js",
+        "handlers":{
+            "actions":{
+                  "Startup":"startKeys"
+            }
+        }
+    }
+    ]
+}
