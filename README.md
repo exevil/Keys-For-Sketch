@@ -66,7 +66,6 @@ Please check the [open issues list](https://github.com/exevil/Keys-For-Sketch/is
 
 ## Support Project
 I spent a lot of time to make this project real so any feedback or donation is really matters. It's wonderful to see that things you do are really making people's lives easier.
-
 ###### Please note that if you're sending your donation from Russian Federation only Russian Roubles will be accepted.
 
 [![](https://d26dzxoao6i3hh.cloudfront.net/items/3N0T3k1i3k2X3Z3f2g3v/Group%209.svg)](https://www.paypal.me/exevil/5)
