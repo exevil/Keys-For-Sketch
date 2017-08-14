@@ -9,6 +9,7 @@
 @protocol VDKSketchMSKeyBindingsProtocol <NSObject>
 
 @property(retain, nonatomic, nonnull) NSMutableDictionary *shortcutMap;
+- (nonnull NSString *)defaultKeyBindingsPath;
 - (nonnull NSString *)userKeyBindingsPath;
 + (nonnull instancetype)sharedController;
 

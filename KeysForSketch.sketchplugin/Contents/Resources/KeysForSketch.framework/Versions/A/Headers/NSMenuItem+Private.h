@@ -11,6 +11,11 @@
 /// A category used to get access to NSMenuItem's private methods.
 @interface NSMenuItem (Private)
 
+/// Key Equivalent that menu item holds directly inside self
+- (NSString *)_rawKeyEquivalent;
+/// Modifier Mask that menu item holds directly inside self
+- (unsigned long long)_rawKeyEquivalentModifierMask;
+
 /// When NO is passed, this method will recache user key equivalents immediately.
 - (void)_recacheUserKeyEquivalentOnlyIfStale:(BOOL)arg1;
 
