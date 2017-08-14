@@ -1,4 +1,4 @@
-![](https://d26dzxoao6i3hh.cloudfront.net/items/0A302N0R3T3u051W0o1S/Image%202017-06-21%20at%201.13.19%20PM.png)
+![](https://d3vv6lp55qjaqc.cloudfront.net/items/3o2L18113H0n2M0E0I09/Readme%20Cover.png)
 
 <br />
 <img src="https://d26dzxoao6i3hh.cloudfront.net/items/0z1f0k2Y0T182m343E1M/Group%202.svg" width="90" align="left">
