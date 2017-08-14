@@ -37,7 +37,7 @@ Keys installation is way the same as any other plugins. Just download latest rel
 1. Choose menu item for shortcut redefinition
 1. Click on its shortcut or on `...` on the right side
 1. Press new short 
-1. Resolve conflicts if needed
+1. Resolve conflict if needed
 1. Enjoy
 
 ## FAQ
