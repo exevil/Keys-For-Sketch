@@ -28,6 +28,7 @@ Keys installation is way the same as any other plugins. Just download latest rel
 * Any third-party plugins support
 * Preferences window integration
 * Intuitive lightning-fast UI
+* Instant menu search
 * Modern Sketch v45 plugin updating system support
 
 ## Usage
