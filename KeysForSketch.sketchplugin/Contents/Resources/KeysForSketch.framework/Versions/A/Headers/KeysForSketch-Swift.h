@@ -204,8 +204,8 @@ SWIFT_CLASS("_TtC13KeysForSketch12MenuObserver")
 @interface MenuObserver : NSObject
 SWIFT_CLASS_PROPERTY(@property (nonatomic, class, readonly, strong) MenuObserver * _Nonnull shared;)
 + (MenuObserver * _Nonnull)shared SWIFT_WARN_UNUSED_RESULT;
-/// Invoke <code>shared()</code> if needed and start an observing.
 - (void)startObserving;
+- (void)stopObserving;
 - (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
 @end
 

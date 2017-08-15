@@ -16,6 +16,5 @@
 @property (class, readonly, nonnull) NSString *prefsIdentifier;
 
 + (void)start;
-+ (void)shut;
 
 @end
