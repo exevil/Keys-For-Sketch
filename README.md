@@ -19,7 +19,7 @@ Keys is a full-featured shortcut manager for Sketch. Integrated directly to Pref
 ## Installation
 Keys installation is way the same as any other plugins. Just download latest release and double-click it.
 
-[![](https://d26dzxoao6i3hh.cloudfront.net/items/0x1V0z2p0P29120B170h/Group%207.svg)](https://github.com/exevil/Keys-For-Sketch/releases/latest) [![](https://d3vv6lp55qjaqc.cloudfront.net/items/3G023P1a3c1g2l1W212i/Group%2010.svg)](https://sketchpacks.com/exevil/Keys-For-Sketch/install)
+[<img src="https://d3vv6lp55qjaqc.cloudfront.net/items/3H000j3F3k3e3H0d3v0R/Download%20Button%202.png" height=32>](https://github.com/exevil/Keys-For-Sketch/releases/latest) [<img src="https://d3vv6lp55qjaqc.cloudfront.net/items/353F0J1L1K3Q2w1U3o2C/btn1@2x.png" height=32>](https://sketchpacks.com/exevil/Keys-For-Sketch/install)
 
 ## Features
 * Easily menu shortcuts customization
@@ -73,6 +73,6 @@ Please check the [open issues list](https://github.com/exevil/Keys-For-Sketch/is
 ## Support Project
 I spent a lot of time to make this project real so any feedback or donation is really matters. It's wonderful to see that things you do are really making people's lives easier.
 
-[![](https://d26dzxoao6i3hh.cloudfront.net/items/3N0T3k1i3k2X3Z3f2g3v/Group%209.svg)](https://www.paypal.me/exevil/10)
+[<img src="https://d3vv6lp55qjaqc.cloudfront.net/items/1N3q25013Q2d1l1w0N05/Download%20Button%203.png" height=32>](https://www.paypal.me/exevil/10)
 
 ###### Please note that if you're sending your donation from Russian Federation only Russian Roubles will be accepted.
