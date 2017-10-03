@@ -19,7 +19,7 @@ Keys is a full-featured shortcut manager for Sketch. Integrated directly to Pref
 ## Installation
 Keys installation is way the same as any other plugins. Just download latest release and double-click it.
 
-[![](https://d26dzxoao6i3hh.cloudfront.net/items/0x1V0z2p0P29120B170h/Group%207.svg)](https://github.com/exevil/Keys-For-Sketch/releases/latest)
+[![](https://d26dzxoao6i3hh.cloudfront.net/items/0x1V0z2p0P29120B170h/Group%207.svg)](https://github.com/exevil/Keys-For-Sketch/releases/latest) [![](https://d3vv6lp55qjaqc.cloudfront.net/items/3G023P1a3c1g2l1W212i/Group%2010.svg)](https://sketchpacks.com/exevil/Keys-For-Sketch/install)
 
 ## Features
 * Easily menu shortcuts customization
