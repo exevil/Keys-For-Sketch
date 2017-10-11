@@ -5,13 +5,18 @@
 //  Copyright © 2017 Vyacheslav Dubovitsky. All rights reserved.
 //
 
+// Return principal class used to start an initialization process.
+function principalClass() {
+    return NSClassFromString("KeysForSketch.Keys")
+}
+
+// Load framework and start initialization process if needed.
 function startKeys(context) {
-    if (NSClassFromString("VDKeys") == null) {
+    if (principalClass() == null || principalClass().isLoaded == false) {
         var mocha = Mocha.sharedRuntime()
         var resourcesFolder = context.scriptPath.stringByDeletingLastPathComponent().stringByDeletingLastPathComponent() + "/Resources"
         if (mocha.loadFrameworkWithName_inDirectory("KeysForSketch", resourcesFolder)) {
-            VDKeys.start()
+            principalClass().start()
         }
     }
 }
-

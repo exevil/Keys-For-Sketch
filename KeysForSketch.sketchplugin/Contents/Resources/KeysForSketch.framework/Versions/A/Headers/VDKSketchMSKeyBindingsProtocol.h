@@ -6,9 +6,10 @@
 //  Copyright © 2017 Vyacheslav Dubovitsky. All rights reserved.
 //
 
-@protocol VDKSketchMSKeyBindingsProtocol <NSObject>
+@protocol VDKSketchMSKeyBindingsProtocol
 
-@property(retain, nonatomic, nonnull) NSMutableDictionary *shortcutMap;
+@property(nonnull, retain, nonatomic, readonly) NSMutableDictionary<NSString*, NSString*> *shortcutMap;
+
 - (nonnull NSString *)defaultKeyBindingsPath;
 - (nonnull NSString *)userKeyBindingsPath;
 + (nonnull instancetype)sharedController;

@@ -1,40 +1,46 @@
 //
-//  VDKeysSketchAPI.h
+//  VDKSketchAPI.h
 //  KeysForSketch
 //
 //  Created by Vyacheslav Dubovitsky on 18/03/2017.
 //  Copyright © 2017 Vyacheslav Dubovitsky. All rights reserved.
 //
-
 #import <Cocoa/Cocoa.h>
-// Plugins
-#import "VDKSketchMSPluginManagerWithActionsProtocol.h"
-#import "VDKSketchMSPluginBundleProtocol.h"
-// Other
+
 #import "VDKSketchAppControllerProtocol.h"
-#import "VDKSketchMSDocumentProtocol.h"
 #import "VDKSketchMSPreferencesControllerProtocol.h"
-#import "VDKSketchMSDocumentControllerProtocol.h"
 #import "VDKSketchMSKeyBindingsProtocol.h"
+// Document
+#import "VDKSketchMSDocumentControllerProtocol.h"
+#import "VDKSketchMSDocumentProtocol.h"
+#import "VDKSketchMSDocumentDataProtocol.h"
+#import "VDKSketchMSActionControllerProtocol.h"
+// - Inspector
+#import "VDKSketchMSInspectorControllerProtocol.h"
+#import "VDKSketchMSNormalInspectorProtocol.h"
+#import "VDKSketchMSStandardInspectorViewControllersProtocol.h"
+#import "VDKSketchMSLayerInspectorViewControllerProtocol.h"
+// Layers
+#import "VDKSketchMSLayerArrayProtocol.h"
+#import "VDKSketchMSPageProtocol.h"
+#import "VDKSketchMSArtboardGroupProtocol.h"
+#import "VDKSketchMSLayerGroupProtocol.h"
+#import "VDKSketchMSLayerProtocol.h"
 
 @interface VDKSketchAPI : NSObject
 
-// Shared Instances
-+ (nonnull NSObject<VDKSketchMSPreferencesControllerProtocol> *)preferencesWindowController;
-+ (nonnull id<VDKSketchMSDocumentProtocol>)currentDocument;
-+ (nonnull id<VDKSketchAppControllerProtocol>)appController;
-+ (nonnull id<VDKSketchMSDocumentControllerProtocol>)documentController;
+/// Array of API protocols that represents selected methods from its corresponding Sketch Classes.
+@property (nonatomic, readonly, class) NSArray<Protocol *> * _Nonnull protocols;
 
-// Functions
-/**
- Update singleKeysShortcuts dict of action controllers of all opened documents with given value
- @note: Action controllers stores an original KeyBindings shortcutMap value during initialization and won't updating it automatically, that's why this method should be called every time after updating a shortcutMap value to apply its changes to all opened documents.
- */
-+ (void)updateDocumentsSingleKeyShortcutsWithValue:(nonnull NSDictionary *)newValue;
+// MARK: General
 
-// Other
-+ (nonnull NSURL *)mainPluginsFolderURL;
-+ (nonnull id<VDKSketchMSPluginBundleProtocol>)pluginBundleWithURL:(nonnull NSURL *)url;
-+ (nonnull id<VDKSketchMSKeyBindingsProtocol>)keyBindingsController;
++ (NSWindowController<VDKSketchMSPreferencesControllerProtocol> *_Nonnull)preferencesController;
++ (NSObject<VDKSketchAppControllerProtocol> *_Nonnull)appController;
++ (NSObject<VDKSketchMSKeyBindingsProtocol> *_Nonnull)keyBindingsController;
+
+// MARK: Document
+
++ (NSDocumentController<VDKSketchMSDocumentControllerProtocol> *_Nonnull)sharedDocumentController;
++ (NSDocument<VDKSketchMSDocumentProtocol> *_Nullable)currentDocument;
 
 @end

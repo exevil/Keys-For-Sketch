@@ -5,13 +5,16 @@
 //  Created by Vyacheslav Dubovitsky on 20/03/2017.
 //  Copyright © 2017 Vyacheslav Dubovitsky. All rights reserved.
 //
-#import "VDKMSActionControllerProtocol.h"
 
-@protocol VDKSketchMSDocumentProtocol <NSObject>
+@protocol VDKSketchMSActionControllerProtocol, VDKSketchMSLayerArrayProtocol, VDKSketchMSDocumentDataProtocol, VDKSketchMSInspectorControllerProtocol;
 
-@property(retain, nonatomic) NSWindow *documentWindow;
-@property(retain, nonatomic) id<VDKMSActionControllerProtocol> actionsController;
+@protocol VDKSketchMSDocumentProtocol
 
-+ (id)currentDocument;
+@property(nonnull, retain, nonatomic) NSObject<VDKSketchMSDocumentDataProtocol> *documentData;
+@property(nonnull, retain, nonatomic) NSObject<VDKSketchMSActionControllerProtocol> *actionsController;
+@property(nonnull, retain, nonatomic) NSViewController<VDKSketchMSInspectorControllerProtocol> *inspectorController;
+@property(nullable, copy, nonatomic) NSObject<VDKSketchMSLayerArrayProtocol> *selectedLayers;
+
++ (nullable instancetype)currentDocument;
 
 @end

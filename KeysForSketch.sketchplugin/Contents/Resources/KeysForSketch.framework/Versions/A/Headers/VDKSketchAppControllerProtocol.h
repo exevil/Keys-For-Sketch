@@ -6,13 +6,9 @@
 //  Copyright © 2017 Vyacheslav Dubovitsky. All rights reserved.
 //
 
-@protocol VDKSketchMSPluginManagerWithActionsProtocol;
+@protocol VDKSketchAppControllerProtocol
 
-@protocol VDKSketchAppControllerProtocol <NSObject>
-
-@property(retain, nonatomic) id<VDKSketchMSPluginManagerWithActionsProtocol> pluginManager;
-
-+ (id)sharedInstance;
-- (void)menuNeedsUpdate:(id)arg1;
++ (nonnull instancetype)sharedInstance;
+- (void)refreshCurrentDocument;
 
 @end

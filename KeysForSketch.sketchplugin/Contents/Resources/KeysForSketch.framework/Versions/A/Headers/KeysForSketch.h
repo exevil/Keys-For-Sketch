@@ -6,8 +6,9 @@
 //  Copyright © 2017 Vyacheslav Dubovitsky. All rights reserved.
 //
 
-@import MASShortcut;
-#import "VDKeys.h"
+#import <MASShortcut/Shortcut.h>
 #import "VDKSketchAPI.h"
 #import "VDK_JRSwizzle.h"
 #import "NSMenuItem+Private.h"
+#import "lorgnette.h"
+#import "lorgnette-structs.h"

@@ -6,9 +6,10 @@
 //  Copyright © 2017 Vyacheslav Dubovitsky. All rights reserved.
 //
 
-@protocol VDKSketchMSDocumentControllerProtocol <NSObject>
+@protocol VDKSketchMSDocumentProtocol;
 
-+ (instancetype)sharedDocumentController;
-- (void)openDocumentWithContentsOfURL:(NSURL *)arg1 display:(BOOL)arg2 completionHandler:(void (^)(NSDocument *document, BOOL documentWasAlreadyOpen, NSError *error))arg3;
+@protocol VDKSketchMSDocumentControllerProtocol
+
++ (nonnull instancetype)sharedDocumentController;
 
 @end
