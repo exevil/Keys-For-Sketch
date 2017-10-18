@@ -65,7 +65,10 @@ Access these menu items manually through app menu and Keys should show it proper
 #### — Keys conflicts with other plugins that using earlier Swift versions. Is there a way to fix it?
 Unfortunately, there isn't. In simple terms, there's no capability between different Swift versions right now so it may produce an errors at runtime.
 
-But it's not really a big deal. Firstly, the Swift team has already announced that ABI capability feature is planned for the next major Swift release and this is the first priority right now. Secondly, plugins can't conflict each other while the latest available Swift version is used for both of them. And requesting an author for an update may be a good temporary solution for this problem.
+But it's not really a big deal. Firstly, the Swift team has already announced that ABI capability feature is planned for the next major Swift release and this is the first priority right now. Secondly, plugins can't conflict each other while the latest available Swift version is used for both of them. And requesting author for an update may be a good temporary solution for this problem.
+
+#### — Why I can't remove default shortcut from a menu item?
+Since Keys plugin is wrapping a default System Preferences shortcut assignment flow it follows the same rules. So any default shortcut are constant until you either replace it with your own or use the same combination for another menu item.
 
 #### — My issue isn't listed here. What now?
 Please check the [open issues list](https://github.com/exevil/Keys-For-Sketch/issues) and feel free to create a new one if you don't see your problem there.
