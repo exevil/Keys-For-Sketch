@@ -41,6 +41,9 @@ Keys installation is way the same as any other plugins. Just download latest rel
 1. Enjoy
 
 ## FAQ
+#### — There is a Keys-related bug in latest beta version of Sketch. What should I do?
+The only you can do is check [the issues list](https://github.com/exevil/Keys-For-Sketch/issues) and report your issue if no-one did it before. Right now Keys supports only the latest stable Sketch version, so you should expect an update right after its release.
+
 #### — Where can I see the changelog?
 On the [Releases](https://github.com/exevil/Keys-For-Sketch/releases) page.
 
