@@ -12,6 +12,6 @@
 
 - (nonnull NSString *)defaultKeyBindingsPath;
 - (nonnull NSString *)userKeyBindingsPath;
-+ (nonnull instancetype)sharedController;
++ (nonnull instancetype)sharedInstance;
 
 @end

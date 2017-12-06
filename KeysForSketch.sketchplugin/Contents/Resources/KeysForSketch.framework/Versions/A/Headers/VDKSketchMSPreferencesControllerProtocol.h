@@ -13,5 +13,7 @@
 @property(nonnull, copy, nonatomic) NSDictionary<NSToolbarItemIdentifier, Class> *preferencePaneClasses;
 @property(nonatomic) unsigned long long selectedTabIndex;
 
++ (nonnull id)sharedController;
 - (void)switchToPaneWithIdentifier:(nonnull NSToolbarItemIdentifier)arg1;
+
 @end
