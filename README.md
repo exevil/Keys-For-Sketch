@@ -50,14 +50,14 @@ On the [Releases](https://github.com/exevil/Keys-For-Sketch/releases) page.
 #### — How to restore default Sketch shortcuts?
 Use «Restore Default Shortcuts...» command from plugin menu. *It should remove any user shortcut data includinge one that defined directly in System Preferences.*
 
-#### — How Keys will affect a custom shortcuts I defined earlier in System Preferences?
-Since Keys are using default system storage for shortcuts it shouldn't affect without additional user actions like «Restore Default Shortcuts...» command from plugin menu.
+#### — How Keys will affect custom shortcuts I defined earlier in System Preferences?
+Since Keys is using default system storage for shortcuts it shouldn't affect previously set shortcuts without additional user actions like «Restore Default Shortcuts...» command from plugin menu.
 
-#### — Can't see my Keys shortcuts in System Preferences. Is something wrong?
-Since System Preferences caches shortcut values from storage once upon startup you need to completely relaunch it to get updated shortcut data there.
+#### — Can't see my Keys shortcuts in System Preferences. Is it something wrong?
+Since System Preferences caches shortcut values from storage once upon a startup you need to completely relaunch it to get updated shortcut data there.
 
 #### — What happens with my custom shortcuts if I remove Keys?
-Nothing because all your shortcuts were defined in System Preferences.
+Nothing, because all your shortcuts were defined in System Preferences.
 
 #### — I removed Keys and my custom shortcuts manually from System Preferences, but tools with single-character shortcuts (like Pencil or Vector) are still using previously defined values. How to reset it to defaults too?
 Since Sketch manages single character shortcuts by itself, you should delete `keyBindings.plist` from `~/Library/Application Support/com.bohemiancoding.sketch3/` folder and restart Sketch to return default tools shortcuts.
@@ -65,10 +65,10 @@ Since Sketch manages single character shortcuts by itself, you should delete `ke
 #### — Some menu items aren't shown in Keys. How to fix?
 Access these menu items manually through app menu and Keys should show it properly.
 
-#### — Keys conflicts with other plugins that using earlier Swift versions. Is there a way to fix it?
+#### — Keys conflicts with other plugins that using earlier Swift versions. Is there any way to fix it?
 Unfortunately, there isn't. In simple terms, there's no capability between different Swift versions right now so it may produce an errors at runtime.
 
-But it's not really a big deal. Firstly, the Swift team has already announced that ABI capability feature is planned for the next major Swift release and this is the first priority right now. Secondly, plugins can't conflict each other while the latest available Swift version is used for both of them. And requesting author for an update may be a good temporary solution for this problem.
+But it's not really a big deal. Firstly, the Swift team has already announced that ABI capability feature is planned for the next major Swift release and this is the first priority right now. Secondly, plugins can't conflict each other while the latest available Swift version is used for all of them and requesting author for an update may be a good temporary solution for this problem.
 
 #### — Why I can't remove default shortcut from a menu item?
 Since Keys plugin is wrapping a default System Preferences shortcut assignment flow it follows the same rules. So any default shortcut are constant until you either replace it with your own or use the same combination for another menu item.
