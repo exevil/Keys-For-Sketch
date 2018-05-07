@@ -4,7 +4,7 @@
     "author" : "Vyacheslav Dubovitsky",
     "homepage" : "https://github.com/exevil/Keys-For-Sketch/releases",
     "appcast" : "https://api.sketchpacks.com/v1/plugins/com.vyacheslav-dubovitsky.KeysForSketch/appcast",
-    "version" : "0.8.8",
+    "version" : "0.8.9",
     "description" : "Advanced shortcut manager for Sketch",
     "authorEmail" : "m@dbv.ae",
     "commands" : [

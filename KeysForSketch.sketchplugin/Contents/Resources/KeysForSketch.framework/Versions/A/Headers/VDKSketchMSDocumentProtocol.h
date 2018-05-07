@@ -13,7 +13,6 @@
 @property(nonnull, retain, nonatomic) NSObject<VDKSketchMSDocumentDataProtocol> *documentData;
 @property(nonnull, retain, nonatomic) NSObject<VDKSketchMSActionControllerProtocol> *actionsController;
 @property(nonnull, retain, nonatomic) NSViewController<VDKSketchMSInspectorControllerProtocol> *inspectorController;
-@property(nullable, copy, nonatomic) NSObject<VDKSketchMSLayerArrayProtocol> *selectedLayers;
 
 + (nullable instancetype)currentDocument;
 
