@@ -73,6 +73,9 @@ But it's not really a big deal. Firstly, the Swift team has already announced th
 #### — Why I can't remove default shortcut from a menu item?
 Since Keys plugin is wrapping a default System Preferences shortcut assignment flow it follows the same rules. So any default shortcut are constant until you either replace it with your own or use the same combination for another menu item.
 
+#### — Why it's not possible to assign a single-character shortcut to menu item other than specific items under the insert menu?
+Since Sketch itself is using an internal predefined list of menu items that allowed a single-character shortcut to be set, Keys can customize single-character shortcuts only for these items.
+
 #### — My issue isn't listed here. What now?
 Please check the [open issues list](https://github.com/exevil/Keys-For-Sketch/issues) and feel free to create a new one if you don't see your problem there.
 
