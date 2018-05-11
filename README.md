@@ -63,7 +63,7 @@ Nothing, because all your shortcuts were defined in System Preferences.
 Since Sketch manages single character shortcuts by itself, you should delete `keyBindings.plist` from `~/Library/Application Support/com.bohemiancoding.sketch3/` folder and restart Sketch to return default tools shortcuts.
 
 #### — Some menu items aren't shown in Keys. How to fix?
-Access these menu items manually through app menu and Keys should show it properly.
+Internally Sketch may not properly draw some menu items prior to their first appearance in menu, that's why the only way to make these kind of menu items configurable with Keys is to manually access it through the app menu first.
 
 #### — Keys conflicts with other plugins that using earlier Swift versions. Is there any way to fix it?
 Unfortunately, there isn't. In simple terms, there's no capability between different Swift versions right now so it may produce an errors at runtime.
