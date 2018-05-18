@@ -1,3 +1,8 @@
+## Attention! Plugin support has been discontinued
+Since I don't have much time for further plugin developement and new Sketch releases produces bugs pretty often I decided to discontinue the project support.
+
+---
+
 ![](./Assets/img_cover.png)
 
 <br />
