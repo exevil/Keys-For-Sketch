@@ -1,0 +1,203 @@
+<html><head><meta charset="utf-8"/><style>
+
+body, table { font: 10pt Menlo Regular; }
+
+.builtin  { color: #A90D91; }
+.comment  { color: #10743E; }
+.url  { color: blue; }
+.doccomment { color: #10743E; }
+.identifier { color: #3F6E74; }
+.keyword { color: #AD0D91; }
+.number { color: #1D26E1; }
+.string { color: #CB444D; }
+.typeidentifier { color: #5C2599; }
+
+.XcAttention { }
+.XcBinding { }
+.XcBuiltinType { }
+.XcCallable { }
+.XcCategory { color: blue; }
+.XcClass { color: blue; }
+.XcClassMethod { color: darkgreen; }
+.XcClassMethodTemplate {  color: darkgreen; }
+.XcClassProperty { color: darkred; }
+.XcClassTemplate { color: blue; }
+.XcClassVariable { color: darkred; }
+.XcContainer { }
+.XcEnum { color: #e68a00; }
+.XcEnumConstant { color: #e68a00; }
+.XcExtension { color: cyan; }
+.XcField { color: darkred; }
+.XcFixMe {}
+.XcFunction { color: darkgreen; }
+.XcFunctionTemplate { color: darkgreen; }
+.XcGKInspectableProperty {}
+.XcGlobal { color: darkred; }
+.XcGlobalVariable { color: darkred; }
+.XcIBActionMethod { color: brown; }
+.XcIBOutlet { color: brown; }
+.XcIBOutletCollection { color: brown; }
+.XcIBOutletCollectionProperty { color: brown; }
+.XcIBOutletCollectionVariable { color: brown; }
+.XcIBOutletProperty { color: brown; }
+.XcIBOutletVariable { color: brown; }
+.XcInstanceMethod { color: darkgreen; }
+.XcInstanceMethodTemplate { color: darkgreen; }
+.XcInstanceVariable { color: darkred; }
+.XcLocalVariable { }
+.XcMacro {}
+.XcMark {}
+.XcMember {}
+.XcMemberContainer {}
+.XcNamespace {}
+.XcParameter {}
+.XcProperty { color: darkred; }
+.XcProtocol { color: purple; }
+.XcQuestion {}
+.XcStaticMethod { color: darkgreen; }
+.XcStaticProperty { color: darkred; }
+.XcStruct { color: #5858ff; }
+/* .XcSwift.Struct */
+.XcTestMethod { }
+.XcToDo {}
+.XcTypedef {}
+.XcUnion  {}
+
+pre.#source { font-family: -apple-system; }
+span#selected { }
+span.highlighted { font-weight: bold; }
+.declaration { font-style: italic; }
+
+div.changesHeader { font-weight: bold; padding-bottom: 8px; }
+
+div.error { font-weight: bold; }
+div.log { }
+div.usr { padding-bottom: 8px; }
+
+div.changesEntry { padding-top: 4px; padding-bottom: 8px; }
+a.sourceLink { background-color: #e8e8e8; }
+span.linenumber { color: darkgrey; }
+span.covered { border-right: 2px inset green; }
+
+div.applying { }
+span.oldValue { color: red; }
+span.newValue { color: green; }
+
+/* HTML extract */
+
+span.references { display: none; position: absolute; border: 2px outset; z-index: 100; }
+span.references table { background-color: white; }
+span.references table tr td { border: 1px inset; font: 10pt Courier New; }
+span.references table tr.decl td { font-style: italic; }
+
+div.filelist { font-family: -apple-system; font-size: 12pt; }
+div.filelist a { margin: 4px; }
+
+</style><script>
+
+var boldened, source
+
+function setSource( html ) {
+    if ( !source )
+        source = document.getElementById("source")
+
+    if ( source.children.length )
+        source.children[0].style.display = "none"
+
+    var div = document.createElement("div")
+    div.innerHTML = html
+    source.insertBefore(div,source.children[0])
+
+    boldened = null
+
+    var selected = document.getElementById( "selected" )
+    if ( selected ) {
+        scrollTo( 0, selected.offsetTop-window.innerHeight/3 )
+        if ( selected.getAttribute("cascade") != 0 )
+            searchSelected( selected, 0, 1 )
+        else
+            getSelection().setBaseAndExtent(selected, 0, selected, 1)
+    }
+    else
+        scrollTo( 0, 0 )
+
+    window.onmouseup = function() {
+        searchSelected( event.srcElement, event.metaKey, 0, 1 )
+        event.cancelBubble = true
+    }
+}
+
+function appendSource( path, filtered ) {
+    var span = document.createElement("span")
+    span.innerHTML = filtered
+    span.title = path
+    source.children[0].appendChild(span)
+}
+
+function searchSelected( span, meta, cascade, click ) {
+    var innerSpan = span
+    while ( span && !span.getAttribute("line") )
+        span = span.parentElement
+
+    if ( span ) {
+
+        if ( window.appController && (span.getAttribute("entity") != 0 || cascade) ) {
+            getSelection().setBaseAndExtent(span, 0, span, 1)
+
+            if ( boldened )
+                boldened.style.fontWeight = "normal"
+            boldened = innerSpan
+            if ( !cascade )
+                boldened.style.fontWeight = "bold"
+
+            if ( span.getAttribute("entity") != 0 )
+                appController.selectedWithText_title_line_col_offset_metaKey_( span.innerText, span.title,
+                    span.getAttribute("line"), span.getAttribute("col"), span.getAttribute("offset"), meta )
+        }
+
+        if ( window.appController2 && click ) {
+            getSelection().setBaseAndExtent(span, 0, span, 1)
+            appController2.changeSelectedWithText_title_line_col_offset_metaKey_( span.innerText, span.title,
+                span.getAttribute("line"), span.getAttribute("col"), span.getAttribute("offset"), meta )
+        }
+    }
+}
+
+function gotoFile( file, line ) {
+    appController2.gotoWithFile_line_( file, line )
+    return false
+}
+
+function gotoLine( line ) {
+    var label = document.getElementById( "L"+line )
+    label.style.color = "red"
+    scrollTo( 0, label.offsetTop-window.innerHeight/3 )
+}
+
+var lastlink;
+
+function expand(a, metaKey) {
+    if ( metaKey )
+        return true
+    var last = a.children.length-1
+    if ( a.children[last].style.display != "block" ) {
+        if ( lastlink )
+            lastlink.style.display = "none";
+        a.children[last].style.display = "block";
+        lastlink = a.children[last];
+    }
+    else {
+        a.children[last].style.display = "none";
+        lastlink = null;
+    }
+    return false;
+}
+
+</script></head>
+<body><pre id="source">
+<span class='linenumber' id=L1>0001&nbsp;</span>#<span line=1 col=2 offset=1 title="Pods/Target Support Files/MASShortcut/MASShortcut-dummy.m#1:2   -1" class='keyword' entity=0>import</span> &lt;<span line=1 col=10 offset=9 title="Pods/Target Support Files/MASShortcut/MASShortcut-dummy.m#1:10   -1" class='identifier' entity=0>Foundation</span>/<span line=1 col=21 offset=20 title="Pods/Target Support Files/MASShortcut/MASShortcut-dummy.m#1:21   -1" class='identifier' entity=0>Foundation</span>.<span line=1 col=32 offset=31 title="Pods/Target Support Files/MASShortcut/MASShortcut-dummy.m#1:32   -1" class='identifier' entity=0>h</span>>
+<span class='linenumber' id=L2>0002&nbsp;</span>@<span line=2 col=2 offset=35 title="Pods/Target Support Files/MASShortcut/MASShortcut-dummy.m#2:2   -1" class='identifier' entity=0>interface</span> <span line=2 col=12 offset=45 title="Pods/Target Support Files/MASShortcut/MASShortcut-dummy.m#2:12 c:objc(cs)PodsDummy_MASShortcut Xcode.SourceCodeSymbolKind.Class 1" class='XcClass identifier' entity=1><a style='color: inherit' name='L2' href='Pods_Target Support Files_MASShortcut_MASShortcut-dummy.m.html#L4' target=_self onclick='return expand(this, event.metaKey);'><span class=declaration>PodsDummy_MASShortcut</span><span class='references'><table><tr class=decl><td style='text-decoration: underline;' onclick='document.location.href="Pods_Target Support Files_MASShortcut_MASShortcut-dummy.m.html#L4"; return false;'>MASShortcut-dummy.m</td><td><pre><span class='linenumber' id=L4>0004&nbsp;</span>@<span class='identifier' entity=0>implementation</span> <span class='XcClass identifier' entity=1><span class=highlighted id=selected cascade=1><span class=declaration>PodsDummy_MASShortcut</span></span></span></pre></td></table></span></a></span> : <span line=2 col=36 offset=69 title="Pods/Target Support Files/MASShortcut/MASShortcut-dummy.m#2:36 c:objc(cs)NSObject Xcode.SourceCodeSymbolKind.Class 3" class='XcClass identifier' entity=1>NSObject</span>
+<span class='linenumber' id=L3>0003&nbsp;</span>@<span line=3 col=2 offset=79 title="Pods/Target Support Files/MASShortcut/MASShortcut-dummy.m#3:2   -1" class='identifier' entity=0>end</span>
+<span class='linenumber' id=L4>0004&nbsp;</span>@<span line=4 col=2 offset=84 title="Pods/Target Support Files/MASShortcut/MASShortcut-dummy.m#4:2   -1" class='identifier' entity=0>implementation</span> <span line=4 col=17 offset=99 title="Pods/Target Support Files/MASShortcut/MASShortcut-dummy.m#4:17 c:objc(cs)PodsDummy_MASShortcut Xcode.SourceCodeSymbolKind.Class 2" class='XcClass identifier' entity=1><a style='color: inherit' name='L4' href='Pods_Target Support Files_MASShortcut_MASShortcut-dummy.m.html#L4' target=_self onclick='return expand(this, event.metaKey);'><span class=declaration>PodsDummy_MASShortcut</span><span class='references'><table><tr><td style='text-decoration: underline;' onclick='document.location.href="Pods_Target Support Files_MASShortcut_MASShortcut-dummy.m.html#L2"; return false;'>MASShortcut-dummy.m</td><td><pre><span class='linenumber' id=L2>0002&nbsp;</span>@<span class='identifier' entity=0>interface</span> <span class='XcClass identifier' entity=1><span class=highlighted id=selected cascade=1><span class=declaration>PodsDummy_MASShortcut</span></span></span> : <span class='XcClass identifier' entity=1><span class=highlighted id=selected cascade=1>NSObject</span></span></pre></td></table></span></a></span>
+<span class='linenumber' id=L5>0005&nbsp;</span>@<span line=5 col=2 offset=122 title="Pods/Target Support Files/MASShortcut/MASShortcut-dummy.m#5:2   -1" class='identifier' entity=0>end</span>
+<span class='linenumber' id=L6>0006&nbsp;</span>

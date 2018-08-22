@@ -1,0 +1,215 @@
+<html><head><meta charset="utf-8"/><style>
+
+body, table { font: 10pt Menlo Regular; }
+
+.builtin  { color: #A90D91; }
+.comment  { color: #10743E; }
+.url  { color: blue; }
+.doccomment { color: #10743E; }
+.identifier { color: #3F6E74; }
+.keyword { color: #AD0D91; }
+.number { color: #1D26E1; }
+.string { color: #CB444D; }
+.typeidentifier { color: #5C2599; }
+
+.XcAttention { }
+.XcBinding { }
+.XcBuiltinType { }
+.XcCallable { }
+.XcCategory { color: blue; }
+.XcClass { color: blue; }
+.XcClassMethod { color: darkgreen; }
+.XcClassMethodTemplate {  color: darkgreen; }
+.XcClassProperty { color: darkred; }
+.XcClassTemplate { color: blue; }
+.XcClassVariable { color: darkred; }
+.XcContainer { }
+.XcEnum { color: #e68a00; }
+.XcEnumConstant { color: #e68a00; }
+.XcExtension { color: cyan; }
+.XcField { color: darkred; }
+.XcFixMe {}
+.XcFunction { color: darkgreen; }
+.XcFunctionTemplate { color: darkgreen; }
+.XcGKInspectableProperty {}
+.XcGlobal { color: darkred; }
+.XcGlobalVariable { color: darkred; }
+.XcIBActionMethod { color: brown; }
+.XcIBOutlet { color: brown; }
+.XcIBOutletCollection { color: brown; }
+.XcIBOutletCollectionProperty { color: brown; }
+.XcIBOutletCollectionVariable { color: brown; }
+.XcIBOutletProperty { color: brown; }
+.XcIBOutletVariable { color: brown; }
+.XcInstanceMethod { color: darkgreen; }
+.XcInstanceMethodTemplate { color: darkgreen; }
+.XcInstanceVariable { color: darkred; }
+.XcLocalVariable { }
+.XcMacro {}
+.XcMark {}
+.XcMember {}
+.XcMemberContainer {}
+.XcNamespace {}
+.XcParameter {}
+.XcProperty { color: darkred; }
+.XcProtocol { color: purple; }
+.XcQuestion {}
+.XcStaticMethod { color: darkgreen; }
+.XcStaticProperty { color: darkred; }
+.XcStruct { color: #5858ff; }
+/* .XcSwift.Struct */
+.XcTestMethod { }
+.XcToDo {}
+.XcTypedef {}
+.XcUnion  {}
+
+pre.#source { font-family: -apple-system; }
+span#selected { }
+span.highlighted { font-weight: bold; }
+.declaration { font-style: italic; }
+
+div.changesHeader { font-weight: bold; padding-bottom: 8px; }
+
+div.error { font-weight: bold; }
+div.log { }
+div.usr { padding-bottom: 8px; }
+
+div.changesEntry { padding-top: 4px; padding-bottom: 8px; }
+a.sourceLink { background-color: #e8e8e8; }
+span.linenumber { color: darkgrey; }
+span.covered { border-right: 2px inset green; }
+
+div.applying { }
+span.oldValue { color: red; }
+span.newValue { color: green; }
+
+/* HTML extract */
+
+span.references { display: none; position: absolute; border: 2px outset; z-index: 100; }
+span.references table { background-color: white; }
+span.references table tr td { border: 1px inset; font: 10pt Courier New; }
+span.references table tr.decl td { font-style: italic; }
+
+div.filelist { font-family: -apple-system; font-size: 12pt; }
+div.filelist a { margin: 4px; }
+
+</style><script>
+
+var boldened, source
+
+function setSource( html ) {
+    if ( !source )
+        source = document.getElementById("source")
+
+    if ( source.children.length )
+        source.children[0].style.display = "none"
+
+    var div = document.createElement("div")
+    div.innerHTML = html
+    source.insertBefore(div,source.children[0])
+
+    boldened = null
+
+    var selected = document.getElementById( "selected" )
+    if ( selected ) {
+        scrollTo( 0, selected.offsetTop-window.innerHeight/3 )
+        if ( selected.getAttribute("cascade") != 0 )
+            searchSelected( selected, 0, 1 )
+        else
+            getSelection().setBaseAndExtent(selected, 0, selected, 1)
+    }
+    else
+        scrollTo( 0, 0 )
+
+    window.onmouseup = function() {
+        searchSelected( event.srcElement, event.metaKey, 0, 1 )
+        event.cancelBubble = true
+    }
+}
+
+function appendSource( path, filtered ) {
+    var span = document.createElement("span")
+    span.innerHTML = filtered
+    span.title = path
+    source.children[0].appendChild(span)
+}
+
+function searchSelected( span, meta, cascade, click ) {
+    var innerSpan = span
+    while ( span && !span.getAttribute("line") )
+        span = span.parentElement
+
+    if ( span ) {
+
+        if ( window.appController && (span.getAttribute("entity") != 0 || cascade) ) {
+            getSelection().setBaseAndExtent(span, 0, span, 1)
+
+            if ( boldened )
+                boldened.style.fontWeight = "normal"
+            boldened = innerSpan
+            if ( !cascade )
+                boldened.style.fontWeight = "bold"
+
+            if ( span.getAttribute("entity") != 0 )
+                appController.selectedWithText_title_line_col_offset_metaKey_( span.innerText, span.title,
+                    span.getAttribute("line"), span.getAttribute("col"), span.getAttribute("offset"), meta )
+        }
+
+        if ( window.appController2 && click ) {
+            getSelection().setBaseAndExtent(span, 0, span, 1)
+            appController2.changeSelectedWithText_title_line_col_offset_metaKey_( span.innerText, span.title,
+                span.getAttribute("line"), span.getAttribute("col"), span.getAttribute("offset"), meta )
+        }
+    }
+}
+
+function gotoFile( file, line ) {
+    appController2.gotoWithFile_line_( file, line )
+    return false
+}
+
+function gotoLine( line ) {
+    var label = document.getElementById( "L"+line )
+    label.style.color = "red"
+    scrollTo( 0, label.offsetTop-window.innerHeight/3 )
+}
+
+var lastlink;
+
+function expand(a, metaKey) {
+    if ( metaKey )
+        return true
+    var last = a.children.length-1
+    if ( a.children[last].style.display != "block" ) {
+        if ( lastlink )
+            lastlink.style.display = "none";
+        a.children[last].style.display = "block";
+        lastlink = a.children[last];
+    }
+    else {
+        a.children[last].style.display = "none";
+        lastlink = null;
+    }
+    return false;
+}
+
+</script></head>
+<body><pre id="source">
+<span class='linenumber' id=L1>0001&nbsp;</span><span line=1 col=1 offset=0 title="Sketch API/Protocols/Updater/VDKSketchSUAppcastItemProtocol.h#1:1   -1" class='comment' entity=0>//
+<span class='linenumber' id=L2>0002&nbsp;</span></span><span line=2 col=1 offset=3 title="Sketch API/Protocols/Updater/VDKSketchSUAppcastItemProtocol.h#2:1   -1" class='comment' entity=0>//  VDKSketchSUAppcastItemProtocol.h
+<span class='linenumber' id=L3>0003&nbsp;</span></span><span line=3 col=1 offset=40 title="Sketch API/Protocols/Updater/VDKSketchSUAppcastItemProtocol.h#3:1   -1" class='comment' entity=0>//  KeysForSketch
+<span class='linenumber' id=L4>0004&nbsp;</span></span><span line=4 col=1 offset=58 title="Sketch API/Protocols/Updater/VDKSketchSUAppcastItemProtocol.h#4:1   -1" class='comment' entity=0>//
+<span class='linenumber' id=L5>0005&nbsp;</span></span><span line=5 col=1 offset=61 title="Sketch API/Protocols/Updater/VDKSketchSUAppcastItemProtocol.h#5:1   -1" class='comment' entity=0>//  Created by Vyacheslav Dubovitsky on 20/03/2017.
+<span class='linenumber' id=L6>0006&nbsp;</span></span><span line=6 col=1 offset=113 title="Sketch API/Protocols/Updater/VDKSketchSUAppcastItemProtocol.h#6:1   -1" class='comment' entity=0>//  Copyright © 2017 Vyacheslav Dubovitsky. All rights reserved.
+<span class='linenumber' id=L7>0007&nbsp;</span></span><span line=7 col=1 offset=179 title="Sketch API/Protocols/Updater/VDKSketchSUAppcastItemProtocol.h#7:1   -1" class='comment' entity=0>//
+<span class='linenumber' id=L8>0008&nbsp;</span></span>
+<span class='linenumber' id=L9>0009&nbsp;</span>@<span line=9 col=2 offset=184 title="Sketch API/Protocols/Updater/VDKSketchSUAppcastItemProtocol.h#9:2   -1" class='keyword' entity=0>class</span> <span line=9 col=8 offset=190 title="Sketch API/Protocols/Updater/VDKSketchSUAppcastItemProtocol.h#9:8 c:objc(cs)VDKSketchAPI Xcode.SourceCodeSymbolKind.Class 4" class='XcClass identifier' entity=1><a style='color: inherit' name='L9' href='Sketch API_VDKSketchAPI.h.html#L25' target=_self onclick='return expand(this, event.metaKey);'>VDKSketchAPI<span class='references'><table><tr><td style='text-decoration: underline;' onclick='document.location.href="Sketch API_Protocols_Updater_VDKSketchSUHostProtocol.h.html#L9"; event.stopPropagation(); return false;'>VDKSketchSUHostProtocol.h</td><td><pre><span class='linenumber' id=L9>0009&nbsp;</span>@<span class='keyword' entity=0>class</span> <span class='XcClass identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchAPI</span></span>;</pre></td><tr class=decl><td style='text-decoration: underline;' onclick='document.location.href="Sketch API_VDKSketchAPI.h.html#L25"; return false;'>VDKSketchAPI.h</td><td><pre><span class='linenumber' id=L25>0025&nbsp;</span>@<span class='identifier' entity=0>interface</span> <span class='XcClass identifier' entity=1><span class=highlighted id=selected cascade=1><span class=declaration>VDKSketchAPI</span></span></span> : <span class='XcClass identifier' entity=1><span class=highlighted id=selected cascade=1>NSObject</span></span></pre></td><tr><td style='text-decoration: underline;' onclick='document.location.href="Sketch API_VDKSketchAPI.m.html#L12"; event.stopPropagation(); return false;'>VDKSketchAPI.m</td><td><pre><span class='linenumber' id=L12>0012&nbsp;</span>@<span class='identifier' entity=0>implementation</span> <span class='XcClass identifier' entity=1><span class=highlighted id=selected cascade=1><span class=declaration>VDKSketchAPI</span></span></span></pre></td><tr><td style='text-decoration: underline;' onclick='document.location.href="VDKeys.m.html#L76"; event.stopPropagation(); return false;'>VDKeys.m</td><td><pre><span class='linenumber' id=L76>0076&nbsp;</span>    <span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchMSPreferencesControllerProtocol</span></span>> <span class='identifier' entity=0>prefWindowController</span> = [<span class='XcClass identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchAPI</span></span> <span class='XcClassMethod identifier' entity=1><span class=highlighted id=selected cascade=1>preferencesWindowController</span></span>];</pre></td><tr><td style='text-decoration: underline;' onclick='document.location.href="VDKeys.m.html#L127"; event.stopPropagation(); return false;'>VDKeys.m</td><td><pre><span class='linenumber' id=L127>0127&nbsp;</span>        <span class='XcClass identifier' entity=1><span class=highlighted id=selected cascade=1>NSMutableDictionary</span></span> *<span class='identifier' entity=0>currentSketchMap</span> = [<span class='XcClass identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchAPI</span></span> <span class='XcClassMethod identifier' entity=1><span class=highlighted id=selected cascade=1>keyBindingsController</span></span>].<span class='XcProperty identifier' entity=1><span class=highlighted id=selected cascade=1>keyComboToActionMap</span></span>;</pre></td></table></span></a></span>;
+<span class='linenumber' id=L10>0010&nbsp;</span>
+<span class='linenumber' id=L11>0011&nbsp;</span>@<span line=11 col=2 offset=206 title="Sketch API/Protocols/Updater/VDKSketchSUAppcastItemProtocol.h#11:2   -1" class='keyword' entity=0>protocol</span> <span line=11 col=11 offset=215 title="Sketch API/Protocols/Updater/VDKSketchSUAppcastItemProtocol.h#11:11 c:objc(pl)VDKSketchSUAppcastItemProtocol Xcode.SourceCodeSymbolKind.Protocol 1" class='XcProtocol identifier' entity=1><a style='color: inherit' name='L11' href='Sketch API_Protocols_Updater_VDKSketchSUAppcastItemProtocol.h.html#L11' target=_self onclick='return expand(this, event.metaKey);'><span class=declaration>VDKSketchSUAppcastItemProtocol</span><span class='references'><table><tr><td style='text-decoration: underline;' onclick='document.location.href="Sketch API_Protocols_Updater_VDKSketchSUUpdaterDelegate.h.html#L9"; event.stopPropagation(); return false;'>VDKSketchSUUpdaterDelegate.h</td><td><pre><span class='linenumber' id=L9>0009&nbsp;</span>@<span class='keyword' entity=0>protocol</span> <span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUAppcastItemProtocol</span></span>;</pre></td><tr><td style='text-decoration: underline;' onclick='document.location.href="Sketch API_Protocols_Updater_VDKSketchSUUpdaterDelegate.h.html#L66"; event.stopPropagation(); return false;'>VDKSketchSUUpdaterDelegate.h</td><td><pre><span class='linenumber' id=L66>0066&nbsp;</span>- (<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUAppcastItemProtocol</span></span>>)<span class='identifier' entity=0>bestValidUpdateInAppcast</span>:(<span class='identifier' entity=0>id</span>)<span class='identifier' entity=0>appcast</span> <span class='identifier' entity=0>forUpdater</span>:(<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUUpdaterProtocol</span></span>>)<span class='identifier' entity=0>updater</span>;</pre></td><tr><td style='text-decoration: underline;' onclick='document.location.href="Sketch API_Protocols_Updater_VDKSketchSUUpdaterDelegate.h.html#L74"; event.stopPropagation(); return false;'>VDKSketchSUUpdaterDelegate.h</td><td><pre><span class='linenumber' id=L74>0074&nbsp;</span>- (<span class='identifier' entity=0>void</span>)<span class='identifier' entity=0>updater</span>:(<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUUpdaterProtocol</span></span>>)<span class='identifier' entity=0>updater</span> <span class='identifier' entity=0>didFindValidUpdate</span>:(<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUAppcastItemProtocol</span></span>>)<span class='identifier' entity=0>item</span>;</pre></td><tr><td style='text-decoration: underline;' onclick='document.location.href="Sketch API_Protocols_Updater_VDKSketchSUUpdaterDelegate.h.html#L90"; event.stopPropagation(); return false;'>VDKSketchSUUpdaterDelegate.h</td><td><pre><span class='linenumber' id=L90>0090&nbsp;</span>- (<span class='identifier' entity=0>void</span>)<span class='identifier' entity=0>updater</span>:(<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUUpdaterProtocol</span></span>>)<span class='identifier' entity=0>updater</span> <span class='identifier' entity=0>willDownloadUpdate</span>:(<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUAppcastItemProtocol</span></span>>)<span class='identifier' entity=0>item</span> <span class='identifier' entity=0>withRequest</span>:(<span class='XcClass identifier' entity=1><span class=highlighted id=selected cascade=1>NSMutableURLRequest</span></span> *)<span class='identifier' entity=0>request</span>;</pre></td><tr><td style='text-decoration: underline;' onclick='document.location.href="Sketch API_Protocols_Updater_VDKSketchSUUpdaterDelegate.h.html#L99"; event.stopPropagation(); return false;'>VDKSketchSUUpdaterDelegate.h</td><td><pre><span class='linenumber' id=L99>0099&nbsp;</span>- (<span class='identifier' entity=0>void</span>)<span class='identifier' entity=0>updater</span>:(<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUUpdaterProtocol</span></span>>)<span class='identifier' entity=0>updater</span> <span class='identifier' entity=0>failedToDownloadUpdate</span>:(<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUAppcastItemProtocol</span></span>>)<span class='identifier' entity=0>item</span> <span class='identifier' entity=0>error</span>:(<span class='XcClass identifier' entity=1><span class=highlighted id=selected cascade=1>NSError</span></span> *)<span class='identifier' entity=0>error</span>;</pre></td><tr><td style='text-decoration: underline;' onclick='document.location.href="Sketch API_Protocols_Updater_VDKSketchSUUpdaterDelegate.h.html#L114"; event.stopPropagation(); return false;'>VDKSketchSUUpdaterDelegate.h</td><td><pre><span class='linenumber' id=L114>0114&nbsp;</span>- (<span class='identifier' entity=0>void</span>)<span class='identifier' entity=0>updater</span>:(<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUUpdaterProtocol</span></span>>)<span class='identifier' entity=0>updater</span> <span class='identifier' entity=0>willInstallUpdate</span>:(<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUAppcastItemProtocol</span></span>>)<span class='identifier' entity=0>item</span>;</pre></td><tr><td style='text-decoration: underline;' onclick='document.location.href="Sketch API_Protocols_Updater_VDKSketchSUUpdaterDelegate.h.html#L128"; event.stopPropagation(); return false;'>VDKSketchSUUpdaterDelegate.h</td><td><pre><span class='linenumber' id=L128>0128&nbsp;</span>- (<span class='XcTypedef identifier' entity=1><span class=highlighted id=selected cascade=1>BOOL</span></span>)<span class='identifier' entity=0>updater</span>:(<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUUpdaterProtocol</span></span>>)<span class='identifier' entity=0>updater</span> <span class='identifier' entity=0>shouldPostponeRelaunchForUpdate</span>:(<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUAppcastItemProtocol</span></span>>)<span class='identifier' entity=0>item</span> <span class='identifier' entity=0>untilInvoking</span>:(<span class='XcClass identifier' entity=1><span class=highlighted id=selected cascade=1>NSInvocation</span></span> *)<span class='identifier' entity=0>invocation</span>;</pre></td><tr><td style='text-decoration: underline;' onclick='document.location.href="Sketch API_Protocols_Updater_VDKSketchSUUpdaterDelegate.h.html#L206"; event.stopPropagation(); return false;'>VDKSketchSUUpdaterDelegate.h</td><td><pre><span class='linenumber' id=L206>0206&nbsp;</span>- (<span class='identifier' entity=0>void</span>)<span class='identifier' entity=0>updater</span>:(<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUUpdaterProtocol</span></span>>)<span class='identifier' entity=0>updater</span> <span class='identifier' entity=0>willInstallUpdateOnQuit</span>:(<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUAppcastItemProtocol</span></span>>)<span class='identifier' entity=0>item</span> <span class='identifier' entity=0>immediateInstallationInvocation</span>:(<span class='XcClass identifier' entity=1><span class=highlighted id=selected cascade=1>NSInvocation</span></span> *)<span class='identifier' entity=0>invocation</span>;</pre></td><tr><td style='text-decoration: underline;' onclick='document.location.href="Sketch API_Protocols_Updater_VDKSketchSUUpdaterDelegate.h.html#L214"; event.stopPropagation(); return false;'>VDKSketchSUUpdaterDelegate.h</td><td><pre><span class='linenumber' id=L214>0214&nbsp;</span>- (<span class='identifier' entity=0>void</span>)<span class='identifier' entity=0>updater</span>:(<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUUpdaterProtocol</span></span>>)<span class='identifier' entity=0>updater</span> <span class='identifier' entity=0>didCancelInstallUpdateOnQuit</span>:(<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUAppcastItemProtocol</span></span>>)<span class='identifier' entity=0>item</span>;</pre></td></table></span></a></span> &lt;<span line=11 col=43 offset=247 title="Sketch API/Protocols/Updater/VDKSketchSUAppcastItemProtocol.h#11:43 c:objc(pl)NSObject Xcode.SourceCodeSymbolKind.Protocol 3" class='XcProtocol identifier' entity=1>NSObject</span>>
+<span class='linenumber' id=L12>0012&nbsp;</span>
+<span class='linenumber' id=L13>0013&nbsp;</span>@<span line=13 col=2 offset=259 title="Sketch API/Protocols/Updater/VDKSketchSUAppcastItemProtocol.h#13:2   -1" class='identifier' entity=0>property</span> (<span line=13 col=12 offset=269 title="Sketch API/Protocols/Updater/VDKSketchSUAppcastItemProtocol.h#13:12   -1" class='identifier' entity=0>copy</span>, <span line=13 col=18 offset=275 title="Sketch API/Protocols/Updater/VDKSketchSUAppcastItemProtocol.h#13:18   -1" class='identifier' entity=0>readonly</span>) <span line=13 col=28 offset=285 title="Sketch API/Protocols/Updater/VDKSketchSUAppcastItemProtocol.h#13:28 c:objc(cs)NSString Xcode.SourceCodeSymbolKind.Class 4" class='XcClass identifier' entity=1>NSString</span> *<span line=13 col=38 offset=295 title="Sketch API/Protocols/Updater/VDKSketchSUAppcastItemProtocol.h#13:38 c:objc(pl)VDKSketchSUAppcastItemProtocol(py)title Xcode.SourceCodeSymbolKind.Property 1" class='XcProperty identifier' entity=1><a style='color: inherit' name='L13' no_href='Sketch API_Protocols_Updater_VDKSketchSUAppcastItemProtocol.h.html#L13'><span class=declaration>title</span></a></span>;
+<span class='linenumber' id=L14>0014&nbsp;</span>@<span line=14 col=2 offset=303 title="Sketch API/Protocols/Updater/VDKSketchSUAppcastItemProtocol.h#14:2   -1" class='identifier' entity=0>property</span> (<span line=14 col=12 offset=313 title="Sketch API/Protocols/Updater/VDKSketchSUAppcastItemProtocol.h#14:12   -1" class='identifier' entity=0>copy</span>, <span line=14 col=18 offset=319 title="Sketch API/Protocols/Updater/VDKSketchSUAppcastItemProtocol.h#14:18   -1" class='identifier' entity=0>readonly</span>) <span line=14 col=28 offset=329 title="Sketch API/Protocols/Updater/VDKSketchSUAppcastItemProtocol.h#14:28 c:objc(cs)NSString Xcode.SourceCodeSymbolKind.Class 4" class='XcClass identifier' entity=1>NSString</span> *<span line=14 col=38 offset=339 title="Sketch API/Protocols/Updater/VDKSketchSUAppcastItemProtocol.h#14:38 c:objc(pl)VDKSketchSUAppcastItemProtocol(py)versionString Xcode.SourceCodeSymbolKind.Property 1" class='XcProperty identifier' entity=1><a style='color: inherit' name='L14' no_href='Sketch API_Protocols_Updater_VDKSketchSUAppcastItemProtocol.h.html#L14'><span class=declaration>versionString</span></a></span>;
+<span class='linenumber' id=L15>0015&nbsp;</span>@<span line=15 col=2 offset=355 title="Sketch API/Protocols/Updater/VDKSketchSUAppcastItemProtocol.h#15:2   -1" class='identifier' entity=0>property</span> (<span line=15 col=12 offset=365 title="Sketch API/Protocols/Updater/VDKSketchSUAppcastItemProtocol.h#15:12   -1" class='identifier' entity=0>strong</span>, <span line=15 col=20 offset=373 title="Sketch API/Protocols/Updater/VDKSketchSUAppcastItemProtocol.h#15:20   -1" class='identifier' entity=0>readonly</span>) <span line=15 col=30 offset=383 title="Sketch API/Protocols/Updater/VDKSketchSUAppcastItemProtocol.h#15:30 c:objc(cs)NSURL Xcode.SourceCodeSymbolKind.Class 4" class='XcClass identifier' entity=1>NSURL</span> *<span line=15 col=37 offset=390 title="Sketch API/Protocols/Updater/VDKSketchSUAppcastItemProtocol.h#15:37 c:objc(pl)VDKSketchSUAppcastItemProtocol(py)fileURL Xcode.SourceCodeSymbolKind.Property 1" class='XcProperty identifier' entity=1><a style='color: inherit' name='L15' no_href='Sketch API_Protocols_Updater_VDKSketchSUAppcastItemProtocol.h.html#L15'><span class=declaration>fileURL</span></a></span>;
+<span class='linenumber' id=L16>0016&nbsp;</span>
+<span class='linenumber' id=L17>0017&nbsp;</span>@<span line=17 col=2 offset=401 title="Sketch API/Protocols/Updater/VDKSketchSUAppcastItemProtocol.h#17:2   -1" class='identifier' entity=0>end</span>
+<span class='linenumber' id=L18>0018&nbsp;</span>

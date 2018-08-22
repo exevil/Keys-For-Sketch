@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="13196" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13196"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="ViewController" customModule="KeysForSketch" customModuleProvider="target">
+            <connections>
+                <outlet property="actionMenu" destination="zBu-32-Cl6" id="gyt-4N-DGO"/>
+                <outlet property="outlineScrollView" destination="p5O-1O-ses" id="0HY-re-grK"/>
+                <outlet property="outlineView" destination="9LD-kb-yTo" id="G7l-Pq-0rc"/>
+                <outlet property="view" destination="2Q7-t8-6SE" id="4Iq-Jb-dON"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <view id="2Q7-t8-6SE">
+            <rect key="frame" x="0.0" y="0.0" width="520" height="459"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <subviews>
+                <scrollView wantsLayer="YES" fixedFrame="YES" borderType="none" autohidesScrollers="YES" horizontalLineScroll="36" horizontalPageScroll="10" verticalLineScroll="36" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" horizontalScrollElasticity="none" translatesAutoresizingMaskIntoConstraints="NO" id="p5O-1O-ses">
+                    <rect key="frame" x="16" y="42" width="488" height="401"/>
+                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                    <clipView key="contentView" ambiguous="YES" drawsBackground="NO" copiesOnScroll="NO" id="xbM-1G-H8e">
+                        <rect key="frame" x="0.0" y="0.0" width="488" height="401"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="none" columnReordering="NO" columnResizing="NO" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="33" rowSizeStyle="automatic" viewBased="YES" indentationPerLevel="16" outlineTableColumn="wlv-XE-rEr" id="9LD-kb-yTo" customClass="OutlineView" customModule="KeysForSketch" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="0.0" width="488" height="401"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <size key="intercellSpacing" width="2" height="3"/>
+                                <color key="backgroundColor" red="0.9779952422" green="0.9779952422" blue="0.9779952422" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <color key="gridColor" white="0.80000000000000004" alpha="0.2171415441" colorSpace="deviceWhite"/>
+                                <tableColumns>
+                                    <tableColumn identifier="" width="486" minWidth="40" maxWidth="1000" id="wlv-XE-rEr">
+                                        <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
+                                            <font key="font" metaFont="smallSystem"/>
+                                            <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
+                                        </tableHeaderCell>
+                                        <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" enabled="NO" id="fO1-2k-rgV">
+                                            <font key="font" metaFont="system"/>
+                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                        <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                        <prototypeCellViews>
+                                            <tableCellView identifier="menuCell" wantsLayer="YES" id="8Ze-lW-bQO" customClass="ItemTableCellView" customModule="KeysForSketch" customModuleProvider="target">
+                                                <rect key="frame" x="1" y="1" width="486" height="33"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5df-E6-zYS" customClass="ShortcutView" customModule="KeysForSketch" customModuleProvider="target">
+                                                        <rect key="frame" x="335" y="7" width="120" height="19"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                                        <connections>
+                                                            <outlet property="nextKeyView" destination="IBE-AE-hqV" id="70h-yi-mHN"/>
+                                                        </connections>
+                                                    </customView>
+                                                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="IBE-AE-hqV">
+                                                        <rect key="frame" x="459" y="7" width="18" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="shortcut-menu" imagePosition="overlaps" alignment="center" inset="2" id="YB0-AK-oTt">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="contextualMenuButtonAction:" target="8Ze-lW-bQO" id="Hge-97-vkW"/>
+                                                            <outlet property="nextKeyView" destination="HZb-93-i2k" id="3Qm-88-K8Z"/>
+                                                        </connections>
+                                                    </button>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HZb-93-i2k">
+                                                        <rect key="frame" x="2" y="9" width="330" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="bnQ-KI-fp3">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                        <connections>
+                                                            <outlet property="nextKeyView" destination="5df-E6-zYS" id="6sH-Iz-3pF"/>
+                                                        </connections>
+                                                    </textField>
+                                                </subviews>
+                                                <connections>
+                                                    <outlet property="menuButton" destination="IBE-AE-hqV" id="FX5-Ev-zeu"/>
+                                                    <outlet property="shortcutView" destination="5df-E6-zYS" id="tnc-EV-J1A"/>
+                                                    <outlet property="titleLabel" destination="HZb-93-i2k" id="vII-R0-byN"/>
+                                                </connections>
+                                            </tableCellView>
+                                            <tableCellView identifier="separatorCell" wantsLayer="YES" id="ERC-VE-slm">
+                                                <rect key="frame" x="1" y="37" width="486" height="8"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                            </tableCellView>
+                                        </prototypeCellViews>
+                                    </tableColumn>
+                                </tableColumns>
+                                <connections>
+                                    <outlet property="dataSource" destination="NfV-3x-YUn" id="qLg-88-B1n"/>
+                                    <outlet property="delegate" destination="aVo-QV-BRO" id="MwL-mg-15x"/>
+                                </connections>
+                            </outlineView>
+                        </subviews>
+                        <shadow key="shadow">
+                            <color key="color" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                        </shadow>
+                        <nil key="backgroundColor"/>
+                    </clipView>
+                    <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="vrG-sH-sXE">
+                        <rect key="frame" x="-100" y="-100" width="0.0" height="16"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </scroller>
+                    <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="hyh-j4-QVl">
+                        <rect key="frame" x="-16" y="0.0" width="16" height="0.0"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </scroller>
+                </scrollView>
+                <button horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Xez-G2-HDK">
+                    <rect key="frame" x="18" y="12" width="25" height="25"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <buttonCell key="cell" type="help" bezelStyle="helpButton" image="NSActionTemplate" imagePosition="only" alignment="center" inset="2" id="xX7-zX-TCu">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="settingsButtonAction:" target="-2" id="w7w-00-TXV"/>
+                        <outlet property="nextKeyView" destination="jZR-Kz-VEL" id="exz-Fg-sso"/>
+                    </connections>
+                </button>
+                <searchField wantsLayer="YES" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jZR-Kz-VEL" customClass="SearchField" customModule="KeysForSketch" customModuleProvider="target">
+                    <rect key="frame" x="312" y="14" width="192" height="22"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                    <searchFieldCell key="cell" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="left" placeholderString="Search" usesSingleLineMode="YES" bezelStyle="round" id="uLn-0Z-VP1">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        <connections>
+                            <action selector="filterResults:" target="jZR-Kz-VEL" id="DFC-MK-VDz"/>
+                        </connections>
+                    </searchFieldCell>
+                    <connections>
+                        <outlet property="nextKeyView" destination="Xez-G2-HDK" id="s7w-Oo-Jl9"/>
+                        <outlet property="outlineView" destination="9LD-kb-yTo" id="cka-Xk-YfC"/>
+                        <outlet property="outlineViewDataSource" destination="NfV-3x-YUn" id="qxO-9X-KPw"/>
+                    </connections>
+                </searchField>
+            </subviews>
+            <point key="canvasLocation" x="140" y="167.5"/>
+        </view>
+        <customObject id="aVo-QV-BRO" customClass="OutlineViewDelegate" customModule="KeysForSketch" customModuleProvider="target"/>
+        <customObject id="NfV-3x-YUn" customClass="OutlineViewDataSource" customModule="KeysForSketch" customModuleProvider="target"/>
+        <menu id="zBu-32-Cl6" customClass="ActionsMenu" customModule="KeysForSketch" customModuleProvider="target">
+            <items>
+                <menuItem title="Restore Default Shortcuts..." id="GnC-YW-qqg">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="resetButtonAction:" target="zBu-32-Cl6" id="0wh-GQ-Eev"/>
+                    </connections>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="W5m-yO-Gnb"/>
+                <menuItem title="Pro Keys Registration..." hidden="YES" id="xoJ-Vd-8iL">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="proRegistrationInfoButtonAction:" target="zBu-32-Cl6" id="G4c-YV-F3f"/>
+                    </connections>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="1rZ-p2-5xf"/>
+                <menuItem title="Keys Help" id="X0n-Vo-fRU">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="helpButtonAction:" target="zBu-32-Cl6" id="aQ8-oV-q0w"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Report an Issue" id="JxA-hc-ywh">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="reportIssueButtonAction:" target="zBu-32-Cl6" id="N00-ak-j5W"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Support via PayPal" id="SqF-na-8MU">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="supportButtonAction:" target="zBu-32-Cl6" id="PIk-go-VSB"/>
+                    </connections>
+                </menuItem>
+            </items>
+            <point key="canvasLocation" x="-5" y="586"/>
+        </menu>
+    </objects>
+    <resources>
+        <image name="NSActionTemplate" width="14" height="14"/>
+        <image name="shortcut-menu" width="9" height="9"/>
+    </resources>
+</document>

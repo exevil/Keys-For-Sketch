@@ -1,0 +1,398 @@
+<html><head><meta charset="utf-8"/><style>
+
+body, table { font: 10pt Menlo Regular; }
+
+.builtin  { color: #A90D91; }
+.comment  { color: #10743E; }
+.url  { color: blue; }
+.doccomment { color: #10743E; }
+.identifier { color: #3F6E74; }
+.keyword { color: #AD0D91; }
+.number { color: #1D26E1; }
+.string { color: #CB444D; }
+.typeidentifier { color: #5C2599; }
+
+.XcAttention { }
+.XcBinding { }
+.XcBuiltinType { }
+.XcCallable { }
+.XcCategory { color: blue; }
+.XcClass { color: blue; }
+.XcClassMethod { color: darkgreen; }
+.XcClassMethodTemplate {  color: darkgreen; }
+.XcClassProperty { color: darkred; }
+.XcClassTemplate { color: blue; }
+.XcClassVariable { color: darkred; }
+.XcContainer { }
+.XcEnum { color: #e68a00; }
+.XcEnumConstant { color: #e68a00; }
+.XcExtension { color: cyan; }
+.XcField { color: darkred; }
+.XcFixMe {}
+.XcFunction { color: darkgreen; }
+.XcFunctionTemplate { color: darkgreen; }
+.XcGKInspectableProperty {}
+.XcGlobal { color: darkred; }
+.XcGlobalVariable { color: darkred; }
+.XcIBActionMethod { color: brown; }
+.XcIBOutlet { color: brown; }
+.XcIBOutletCollection { color: brown; }
+.XcIBOutletCollectionProperty { color: brown; }
+.XcIBOutletCollectionVariable { color: brown; }
+.XcIBOutletProperty { color: brown; }
+.XcIBOutletVariable { color: brown; }
+.XcInstanceMethod { color: darkgreen; }
+.XcInstanceMethodTemplate { color: darkgreen; }
+.XcInstanceVariable { color: darkred; }
+.XcLocalVariable { }
+.XcMacro {}
+.XcMark {}
+.XcMember {}
+.XcMemberContainer {}
+.XcNamespace {}
+.XcParameter {}
+.XcProperty { color: darkred; }
+.XcProtocol { color: purple; }
+.XcQuestion {}
+.XcStaticMethod { color: darkgreen; }
+.XcStaticProperty { color: darkred; }
+.XcStruct { color: #5858ff; }
+/* .XcSwift.Struct */
+.XcTestMethod { }
+.XcToDo {}
+.XcTypedef {}
+.XcUnion  {}
+
+pre.#source { font-family: -apple-system; }
+span#selected { }
+span.highlighted { font-weight: bold; }
+.declaration { font-style: italic; }
+
+div.changesHeader { font-weight: bold; padding-bottom: 8px; }
+
+div.error { font-weight: bold; }
+div.log { }
+div.usr { padding-bottom: 8px; }
+
+div.changesEntry { padding-top: 4px; padding-bottom: 8px; }
+a.sourceLink { background-color: #e8e8e8; }
+span.linenumber { color: darkgrey; }
+span.covered { border-right: 2px inset green; }
+
+div.applying { }
+span.oldValue { color: red; }
+span.newValue { color: green; }
+
+/* HTML extract */
+
+span.references { display: none; position: absolute; border: 2px outset; z-index: 100; }
+span.references table { background-color: white; }
+span.references table tr td { border: 1px inset; font: 10pt Courier New; }
+span.references table tr.decl td { font-style: italic; }
+
+div.filelist { font-family: -apple-system; font-size: 12pt; }
+div.filelist a { margin: 4px; }
+
+</style><script>
+
+var boldened, source
+
+function setSource( html ) {
+    if ( !source )
+        source = document.getElementById("source")
+
+    if ( source.children.length )
+        source.children[0].style.display = "none"
+
+    var div = document.createElement("div")
+    div.innerHTML = html
+    source.insertBefore(div,source.children[0])
+
+    boldened = null
+
+    var selected = document.getElementById( "selected" )
+    if ( selected ) {
+        scrollTo( 0, selected.offsetTop-window.innerHeight/3 )
+        if ( selected.getAttribute("cascade") != 0 )
+            searchSelected( selected, 0, 1 )
+        else
+            getSelection().setBaseAndExtent(selected, 0, selected, 1)
+    }
+    else
+        scrollTo( 0, 0 )
+
+    window.onmouseup = function() {
+        searchSelected( event.srcElement, event.metaKey, 0, 1 )
+        event.cancelBubble = true
+    }
+}
+
+function appendSource( path, filtered ) {
+    var span = document.createElement("span")
+    span.innerHTML = filtered
+    span.title = path
+    source.children[0].appendChild(span)
+}
+
+function searchSelected( span, meta, cascade, click ) {
+    var innerSpan = span
+    while ( span && !span.getAttribute("line") )
+        span = span.parentElement
+
+    if ( span ) {
+
+        if ( window.appController && (span.getAttribute("entity") != 0 || cascade) ) {
+            getSelection().setBaseAndExtent(span, 0, span, 1)
+
+            if ( boldened )
+                boldened.style.fontWeight = "normal"
+            boldened = innerSpan
+            if ( !cascade )
+                boldened.style.fontWeight = "bold"
+
+            if ( span.getAttribute("entity") != 0 )
+                appController.selectedWithText_title_line_col_offset_metaKey_( span.innerText, span.title,
+                    span.getAttribute("line"), span.getAttribute("col"), span.getAttribute("offset"), meta )
+        }
+
+        if ( window.appController2 && click ) {
+            getSelection().setBaseAndExtent(span, 0, span, 1)
+            appController2.changeSelectedWithText_title_line_col_offset_metaKey_( span.innerText, span.title,
+                span.getAttribute("line"), span.getAttribute("col"), span.getAttribute("offset"), meta )
+        }
+    }
+}
+
+function gotoFile( file, line ) {
+    appController2.gotoWithFile_line_( file, line )
+    return false
+}
+
+function gotoLine( line ) {
+    var label = document.getElementById( "L"+line )
+    label.style.color = "red"
+    scrollTo( 0, label.offsetTop-window.innerHeight/3 )
+}
+
+var lastlink;
+
+function expand(a, metaKey) {
+    if ( metaKey )
+        return true
+    var last = a.children.length-1
+    if ( a.children[last].style.display != "block" ) {
+        if ( lastlink )
+            lastlink.style.display = "none";
+        a.children[last].style.display = "block";
+        lastlink = a.children[last];
+    }
+    else {
+        a.children[last].style.display = "none";
+        lastlink = null;
+    }
+    return false;
+}
+
+</script></head>
+<body><pre id="source">
+<span class='linenumber' id=L1>0001&nbsp;</span><span line=1 col=1 offset=0 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#1:1   -1" class='comment' entity=0>//
+<span class='linenumber' id=L2>0002&nbsp;</span></span><span line=2 col=1 offset=3 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#2:1   -1" class='comment' entity=0>//  VDSketchSUUpdaterProtocol.h
+<span class='linenumber' id=L3>0003&nbsp;</span></span><span line=3 col=1 offset=35 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#3:1   -1" class='comment' entity=0>//  KeysForSketch
+<span class='linenumber' id=L4>0004&nbsp;</span></span><span line=4 col=1 offset=53 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#4:1   -1" class='comment' entity=0>//
+<span class='linenumber' id=L5>0005&nbsp;</span></span><span line=5 col=1 offset=56 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#5:1   -1" class='comment' entity=0>//  Created by Vyacheslav Dubovitsky on 19/03/2017.
+<span class='linenumber' id=L6>0006&nbsp;</span></span><span line=6 col=1 offset=108 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#6:1   -1" class='comment' entity=0>//  Copyright © 2017 Vyacheslav Dubovitsky. All rights reserved.
+<span class='linenumber' id=L7>0007&nbsp;</span></span><span line=7 col=1 offset=174 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#7:1   -1" class='comment' entity=0>//
+<span class='linenumber' id=L8>0008&nbsp;</span></span>
+<span class='linenumber' id=L9>0009&nbsp;</span>@<span line=9 col=2 offset=179 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#9:2   -1" class='keyword' entity=0>protocol</span> <span line=9 col=11 offset=188 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#9:11 c:objc(pl)VDKSketchSUUpdaterDelegate Xcode.SourceCodeSymbolKind.Protocol 4" class='XcProtocol identifier' entity=1><a style='color: inherit' name='L9' href='Sketch API_Protocols_Updater_VDKSketchSUUpdaterDelegate.h.html#L11' target=_self onclick='return expand(this, event.metaKey);'>VDKSketchSUUpdaterDelegate<span class='references'><table><tr class=decl><td style='text-decoration: underline;' onclick='document.location.href="Sketch API_Protocols_Updater_VDKSketchSUUpdaterDelegate.h.html#L11"; return false;'>VDKSketchSUUpdaterDelegate.h</td><td><pre><span class='linenumber' id=L11>0011&nbsp;</span>@<span class='keyword' entity=0>protocol</span> <span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1><span class=declaration>VDKSketchSUUpdaterDelegate</span></span></span> &lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>NSObject</span></span>></pre></td><tr><td style='text-decoration: underline;' onclick='document.location.href="Sketch API_Protocols_Updater_VDKSketchSUUpdaterProtocol.h.html#L19"; event.stopPropagation(); return false;'>VDKSketchSUUpdaterProtocol.h</td><td><pre><span class='linenumber' id=L19>0019&nbsp;</span>@<span class='identifier' entity=0>property</span> (<span class='identifier' entity=0>unsafe_unretained</span>) <span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUUpdaterDelegate</span></span>> <span class='XcProperty identifier' entity=1><span class=highlighted id=selected cascade=1><span class=declaration>delegate</span></span></span>;</pre></td><tr><td style='text-decoration: underline;' onclick='document.location.href="VDKeys.h.html#L12"; event.stopPropagation(); return false;'>VDKeys.h</td><td><pre><span class='linenumber' id=L12>0012&nbsp;</span>@<span class='identifier' entity=0>interface</span> <span class='XcClass identifier' entity=1><span class=highlighted id=selected cascade=1><span class=declaration>VDKeys</span></span></span> : <span class='XcClass identifier' entity=1><span class=highlighted id=selected cascade=1>NSObject</span></span> &lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUUpdaterDelegate</span></span>></pre></td></table></span></a></span>;
+<span class='linenumber' id=L10>0010&nbsp;</span>
+<span class='linenumber' id=L11>0011&nbsp;</span>@<span line=11 col=2 offset=218 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#11:2   -1" class='keyword' entity=0>protocol</span> <span line=11 col=11 offset=227 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#11:11 c:objc(pl)VDKSketchSUUpdaterProtocol Xcode.SourceCodeSymbolKind.Protocol 1" class='XcProtocol identifier' entity=1><a style='color: inherit' name='L11' href='Sketch API_Protocols_Updater_VDKSketchSUUpdaterProtocol.h.html#L11' target=_self onclick='return expand(this, event.metaKey);'><span class=declaration>VDKSketchSUUpdaterProtocol</span><span class='references'><table><tr><td style='text-decoration: underline;' onclick='document.location.href="Sketch API_Protocols_Updater_VDKSketchSUUpdaterDelegate.h.html#L21"; event.stopPropagation(); return false;'>VDKSketchSUUpdaterDelegate.h</td><td><pre><span class='linenumber' id=L21>0021&nbsp;</span>- (<span class='XcTypedef identifier' entity=1><span class=highlighted id=selected cascade=1>BOOL</span></span>)<span class='identifier' entity=0>updaterMayCheckForUpdates</span>:(<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUUpdaterProtocol</span></span>>)<span class='identifier' entity=0>updater</span>;</pre></td><tr><td style='text-decoration: underline;' onclick='document.location.href="Sketch API_Protocols_Updater_VDKSketchSUUpdaterDelegate.h.html#L33"; event.stopPropagation(); return false;'>VDKSketchSUUpdaterDelegate.h</td><td><pre><span class='linenumber' id=L33>0033&nbsp;</span>- (<span class='XcClass identifier' entity=1><span class=highlighted id=selected cascade=1>NSArray</span></span> *)<span class='identifier' entity=0>feedParametersForUpdater</span>:(<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUUpdaterProtocol</span></span>>)<span class='identifier' entity=0>updater</span> <span class='identifier' entity=0>sendingSystemProfile</span>:(<span class='XcTypedef identifier' entity=1><span class=highlighted id=selected cascade=1>BOOL</span></span>)<span class='identifier' entity=0>sendingProfile</span>;</pre></td><tr><td style='text-decoration: underline;' onclick='document.location.href="Sketch API_Protocols_Updater_VDKSketchSUUpdaterDelegate.h.html#L45"; event.stopPropagation(); return false;'>VDKSketchSUUpdaterDelegate.h</td><td><pre><span class='linenumber' id=L45>0045&nbsp;</span>- (<span class='XcClass identifier' entity=1><span class=highlighted id=selected cascade=1>NSString</span></span> *)<span class='identifier' entity=0>feedURLStringForUpdater</span>:(<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUUpdaterProtocol</span></span>>)<span class='identifier' entity=0>updater</span>;</pre></td><tr><td style='text-decoration: underline;' onclick='document.location.href="Sketch API_Protocols_Updater_VDKSketchSUUpdaterDelegate.h.html#L54"; event.stopPropagation(); return false;'>VDKSketchSUUpdaterDelegate.h</td><td><pre><span class='linenumber' id=L54>0054&nbsp;</span>- (<span class='XcTypedef identifier' entity=1><span class=highlighted id=selected cascade=1>BOOL</span></span>)<span class='identifier' entity=0>updaterShouldPromptForPermissionToCheckForUpdates</span>:(<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUUpdaterProtocol</span></span>>)<span class='identifier' entity=0>updater</span>;</pre></td><tr><td style='text-decoration: underline;' onclick='document.location.href="Sketch API_Protocols_Updater_VDKSketchSUUpdaterDelegate.h.html#L66"; event.stopPropagation(); return false;'>VDKSketchSUUpdaterDelegate.h</td><td><pre><span class='linenumber' id=L66>0066&nbsp;</span>- (<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUAppcastItemProtocol</span></span>>)<span class='identifier' entity=0>bestValidUpdateInAppcast</span>:(<span class='identifier' entity=0>id</span>)<span class='identifier' entity=0>appcast</span> <span class='identifier' entity=0>forUpdater</span>:(<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUUpdaterProtocol</span></span>>)<span class='identifier' entity=0>updater</span>;</pre></td><tr><td style='text-decoration: underline;' onclick='document.location.href="Sketch API_Protocols_Updater_VDKSketchSUUpdaterDelegate.h.html#L74"; event.stopPropagation(); return false;'>VDKSketchSUUpdaterDelegate.h</td><td><pre><span class='linenumber' id=L74>0074&nbsp;</span>- (<span class='identifier' entity=0>void</span>)<span class='identifier' entity=0>updater</span>:(<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUUpdaterProtocol</span></span>>)<span class='identifier' entity=0>updater</span> <span class='identifier' entity=0>didFindValidUpdate</span>:(<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUAppcastItemProtocol</span></span>>)<span class='identifier' entity=0>item</span>;</pre></td><tr><td style='text-decoration: underline;' onclick='document.location.href="Sketch API_Protocols_Updater_VDKSketchSUUpdaterDelegate.h.html#L81"; event.stopPropagation(); return false;'>VDKSketchSUUpdaterDelegate.h</td><td><pre><span class='linenumber' id=L81>0081&nbsp;</span>- (<span class='identifier' entity=0>void</span>)<span class='identifier' entity=0>updaterDidNotFindUpdate</span>:(<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUUpdaterProtocol</span></span>>)<span class='identifier' entity=0>updater</span>;</pre></td><tr><td style='text-decoration: underline;' onclick='document.location.href="Sketch API_Protocols_Updater_VDKSketchSUUpdaterDelegate.h.html#L90"; event.stopPropagation(); return false;'>VDKSketchSUUpdaterDelegate.h</td><td><pre><span class='linenumber' id=L90>0090&nbsp;</span>- (<span class='identifier' entity=0>void</span>)<span class='identifier' entity=0>updater</span>:(<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUUpdaterProtocol</span></span>>)<span class='identifier' entity=0>updater</span> <span class='identifier' entity=0>willDownloadUpdate</span>:(<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUAppcastItemProtocol</span></span>>)<span class='identifier' entity=0>item</span> <span class='identifier' entity=0>withRequest</span>:(<span class='XcClass identifier' entity=1><span class=highlighted id=selected cascade=1>NSMutableURLRequest</span></span> *)<span class='identifier' entity=0>request</span>;</pre></td><tr><td style='text-decoration: underline;' onclick='document.location.href="Sketch API_Protocols_Updater_VDKSketchSUUpdaterDelegate.h.html#L99"; event.stopPropagation(); return false;'>VDKSketchSUUpdaterDelegate.h</td><td><pre><span class='linenumber' id=L99>0099&nbsp;</span>- (<span class='identifier' entity=0>void</span>)<span class='identifier' entity=0>updater</span>:(<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUUpdaterProtocol</span></span>>)<span class='identifier' entity=0>updater</span> <span class='identifier' entity=0>failedToDownloadUpdate</span>:(<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUAppcastItemProtocol</span></span>>)<span class='identifier' entity=0>item</span> <span class='identifier' entity=0>error</span>:(<span class='XcClass identifier' entity=1><span class=highlighted id=selected cascade=1>NSError</span></span> *)<span class='identifier' entity=0>error</span>;</pre></td><tr><td style='text-decoration: underline;' onclick='document.location.href="Sketch API_Protocols_Updater_VDKSketchSUUpdaterDelegate.h.html#L106"; event.stopPropagation(); return false;'>VDKSketchSUUpdaterDelegate.h</td><td><pre><span class='linenumber' id=L106>0106&nbsp;</span>- (<span class='identifier' entity=0>void</span>)<span class='identifier' entity=0>userDidCancelDownload</span>:(<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUUpdaterProtocol</span></span>>)<span class='identifier' entity=0>updater</span>;</pre></td><tr><td style='text-decoration: underline;' onclick='document.location.href="Sketch API_Protocols_Updater_VDKSketchSUUpdaterDelegate.h.html#L114"; event.stopPropagation(); return false;'>VDKSketchSUUpdaterDelegate.h</td><td><pre><span class='linenumber' id=L114>0114&nbsp;</span>- (<span class='identifier' entity=0>void</span>)<span class='identifier' entity=0>updater</span>:(<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUUpdaterProtocol</span></span>>)<span class='identifier' entity=0>updater</span> <span class='identifier' entity=0>willInstallUpdate</span>:(<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUAppcastItemProtocol</span></span>>)<span class='identifier' entity=0>item</span>;</pre></td><tr><td style='text-decoration: underline;' onclick='document.location.href="Sketch API_Protocols_Updater_VDKSketchSUUpdaterDelegate.h.html#L128"; event.stopPropagation(); return false;'>VDKSketchSUUpdaterDelegate.h</td><td><pre><span class='linenumber' id=L128>0128&nbsp;</span>- (<span class='XcTypedef identifier' entity=1><span class=highlighted id=selected cascade=1>BOOL</span></span>)<span class='identifier' entity=0>updater</span>:(<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUUpdaterProtocol</span></span>>)<span class='identifier' entity=0>updater</span> <span class='identifier' entity=0>shouldPostponeRelaunchForUpdate</span>:(<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUAppcastItemProtocol</span></span>>)<span class='identifier' entity=0>item</span> <span class='identifier' entity=0>untilInvoking</span>:(<span class='XcClass identifier' entity=1><span class=highlighted id=selected cascade=1>NSInvocation</span></span> *)<span class='identifier' entity=0>invocation</span>;</pre></td><tr><td style='text-decoration: underline;' onclick='document.location.href="Sketch API_Protocols_Updater_VDKSketchSUUpdaterDelegate.h.html#L138"; event.stopPropagation(); return false;'>VDKSketchSUUpdaterDelegate.h</td><td><pre><span class='linenumber' id=L138>0138&nbsp;</span>- (<span class='XcTypedef identifier' entity=1><span class=highlighted id=selected cascade=1>BOOL</span></span>)<span class='identifier' entity=0>updaterShouldRelaunchApplication</span>:(<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUUpdaterProtocol</span></span>>)<span class='identifier' entity=0>updater</span>;</pre></td><tr><td style='text-decoration: underline;' onclick='document.location.href="Sketch API_Protocols_Updater_VDKSketchSUUpdaterDelegate.h.html#L145"; event.stopPropagation(); return false;'>VDKSketchSUUpdaterDelegate.h</td><td><pre><span class='linenumber' id=L145>0145&nbsp;</span>- (<span class='identifier' entity=0>void</span>)<span class='identifier' entity=0>updaterWillRelaunchApplication</span>:(<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUUpdaterProtocol</span></span>>)<span class='identifier' entity=0>updater</span>;</pre></td><tr><td style='text-decoration: underline;' onclick='document.location.href="Sketch API_Protocols_Updater_VDKSketchSUUpdaterDelegate.h.html#L158"; event.stopPropagation(); return false;'>VDKSketchSUUpdaterDelegate.h</td><td><pre><span class='linenumber' id=L158>0158&nbsp;</span>- (<span class='identifier' entity=0>id</span>)<span class='identifier' entity=0>versionComparatorForUpdater</span>:(<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUUpdaterProtocol</span></span>>)<span class='identifier' entity=0>updater</span>;</pre></td><tr><td style='text-decoration: underline;' onclick='document.location.href="Sketch API_Protocols_Updater_VDKSketchSUUpdaterDelegate.h.html#L170"; event.stopPropagation(); return false;'>VDKSketchSUUpdaterDelegate.h</td><td><pre><span class='linenumber' id=L170>0170&nbsp;</span>- (<span class='identifier' entity=0>id</span>)<span class='identifier' entity=0>versionDisplayerForUpdater</span>:(<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUUpdaterProtocol</span></span>>)<span class='identifier' entity=0>updater</span>;</pre></td><tr><td style='text-decoration: underline;' onclick='document.location.href="Sketch API_Protocols_Updater_VDKSketchSUUpdaterDelegate.h.html#L179"; event.stopPropagation(); return false;'>VDKSketchSUUpdaterDelegate.h</td><td><pre><span class='linenumber' id=L179>0179&nbsp;</span>- (<span class='XcClass identifier' entity=1><span class=highlighted id=selected cascade=1>NSString</span></span> *)<span class='identifier' entity=0>pathToRelaunchForUpdater</span>:(<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUUpdaterProtocol</span></span>>)<span class='identifier' entity=0>updater</span>;</pre></td><tr><td style='text-decoration: underline;' onclick='document.location.href="Sketch API_Protocols_Updater_VDKSketchSUUpdaterDelegate.h.html#L187"; event.stopPropagation(); return false;'>VDKSketchSUUpdaterDelegate.h</td><td><pre><span class='linenumber' id=L187>0187&nbsp;</span>- (<span class='identifier' entity=0>void</span>)<span class='identifier' entity=0>updaterWillShowModalAlert</span>:(<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUUpdaterProtocol</span></span>>)<span class='identifier' entity=0>updater</span>;</pre></td><tr><td style='text-decoration: underline;' onclick='document.location.href="Sketch API_Protocols_Updater_VDKSketchSUUpdaterDelegate.h.html#L195"; event.stopPropagation(); return false;'>VDKSketchSUUpdaterDelegate.h</td><td><pre><span class='linenumber' id=L195>0195&nbsp;</span>- (<span class='identifier' entity=0>void</span>)<span class='identifier' entity=0>updaterDidShowModalAlert</span>:(<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUUpdaterProtocol</span></span>>)<span class='identifier' entity=0>updater</span>;</pre></td><tr><td style='text-decoration: underline;' onclick='document.location.href="Sketch API_Protocols_Updater_VDKSketchSUUpdaterDelegate.h.html#L206"; event.stopPropagation(); return false;'>VDKSketchSUUpdaterDelegate.h</td><td><pre><span class='linenumber' id=L206>0206&nbsp;</span>- (<span class='identifier' entity=0>void</span>)<span class='identifier' entity=0>updater</span>:(<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUUpdaterProtocol</span></span>>)<span class='identifier' entity=0>updater</span> <span class='identifier' entity=0>willInstallUpdateOnQuit</span>:(<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUAppcastItemProtocol</span></span>>)<span class='identifier' entity=0>item</span> <span class='identifier' entity=0>immediateInstallationInvocation</span>:(<span class='XcClass identifier' entity=1><span class=highlighted id=selected cascade=1>NSInvocation</span></span> *)<span class='identifier' entity=0>invocation</span>;</pre></td><tr><td style='text-decoration: underline;' onclick='document.location.href="Sketch API_Protocols_Updater_VDKSketchSUUpdaterDelegate.h.html#L214"; event.stopPropagation(); return false;'>VDKSketchSUUpdaterDelegate.h</td><td><pre><span class='linenumber' id=L214>0214&nbsp;</span>- (<span class='identifier' entity=0>void</span>)<span class='identifier' entity=0>updater</span>:(<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUUpdaterProtocol</span></span>>)<span class='identifier' entity=0>updater</span> <span class='identifier' entity=0>didCancelInstallUpdateOnQuit</span>:(<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUAppcastItemProtocol</span></span>>)<span class='identifier' entity=0>item</span>;</pre></td><tr><td style='text-decoration: underline;' onclick='document.location.href="Sketch API_Protocols_Updater_VDKSketchSUUpdaterDelegate.h.html#L222"; event.stopPropagation(); return false;'>VDKSketchSUUpdaterDelegate.h</td><td><pre><span class='linenumber' id=L222>0222&nbsp;</span>- (<span class='identifier' entity=0>void</span>)<span class='identifier' entity=0>updater</span>:(<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUUpdaterProtocol</span></span>>)<span class='identifier' entity=0>updater</span> <span class='identifier' entity=0>didAbortWithError</span>:(<span class='XcClass identifier' entity=1><span class=highlighted id=selected cascade=1>NSError</span></span> *)<span class='identifier' entity=0>error</span>;</pre></td><tr><td style='text-decoration: underline;' onclick='document.location.href="Sketch API_VDKSketchAPI.h.html#L28"; event.stopPropagation(); return false;'>VDKSketchAPI.h</td><td><pre><span class='linenumber' id=L28>0028&nbsp;</span></span><span class=highlighted id=selected cascade=1><span class=declaration>+ (</span></span><span class='identifier' entity=0>nonnull</span> <span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUUpdaterProtocol</span></span>>)<span class='identifier' entity=0>keysSharedUpdater</span>;</pre></td><tr><td style='text-decoration: underline;' onclick='document.location.href="Sketch API_VDKSketchAPI.m.html#L20"; event.stopPropagation(); return false;'>VDKSketchAPI.m</td><td><pre><span class='linenumber' id=L20>0020&nbsp;</span>+ (<span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol typeidentifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUUpdaterProtocol</span></span>>)<span class='identifier' entity=0>keysSharedUpdater</span> {</pre></td></table></span></a></span> &lt;<span line=11 col=39 offset=255 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#11:39 c:objc(pl)NSObject Xcode.SourceCodeSymbolKind.Protocol 3" class='XcProtocol identifier' entity=1>NSObject</span>>
+<span class='linenumber' id=L12>0012&nbsp;</span>
+<span class='linenumber' id=L13>0013&nbsp;</span><span line=13 col=1 offset=266 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#13:1   -1" class='comment' entity=0>/*!
+<span class='linenumber' id=L14>0014&nbsp;</span> The main API in Sparkle for controlling the update mechanism.
+<span class='linenumber' id=L15>0015&nbsp;</span> 
+<span class='linenumber' id=L16>0016&nbsp;</span> This class is used to configure the update paramters as well as manually
+<span class='linenumber' id=L17>0017&nbsp;</span> and automatically schedule and control checks for updates.
+<span class='linenumber' id=L18>0018&nbsp;</span> */</span>
+<span class='linenumber' id=L19>0019&nbsp;</span>@<span line=19 col=2 offset=474 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#19:2   -1" class='identifier' entity=0>property</span> (<span line=19 col=12 offset=484 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#19:12   -1" class='identifier' entity=0>unsafe_unretained</span>) <span line=19 col=31 offset=503 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#19:31   -1" class='identifier' entity=0>id</span>&lt;<span line=19 col=34 offset=506 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#19:34 c:objc(pl)VDKSketchSUUpdaterDelegate Xcode.SourceCodeSymbolKind.Protocol 4" class='XcProtocol identifier' entity=1><a style='color: inherit' name='L19' href='Sketch API_Protocols_Updater_VDKSketchSUUpdaterDelegate.h.html#L11' target=_self onclick='return expand(this, event.metaKey);'>VDKSketchSUUpdaterDelegate<span class='references'><table><tr class=decl><td style='text-decoration: underline;' onclick='document.location.href="Sketch API_Protocols_Updater_VDKSketchSUUpdaterDelegate.h.html#L11"; return false;'>VDKSketchSUUpdaterDelegate.h</td><td><pre><span class='linenumber' id=L11>0011&nbsp;</span>@<span class='keyword' entity=0>protocol</span> <span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1><span class=declaration>VDKSketchSUUpdaterDelegate</span></span></span> &lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>NSObject</span></span>></pre></td><tr><td style='text-decoration: underline;' onclick='document.location.href="Sketch API_Protocols_Updater_VDKSketchSUUpdaterProtocol.h.html#L9"; event.stopPropagation(); return false;'>VDKSketchSUUpdaterProtocol.h</td><td><pre><span class='linenumber' id=L9>0009&nbsp;</span>@<span class='keyword' entity=0>protocol</span> <span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUUpdaterDelegate</span></span>;</pre></td><tr><td style='text-decoration: underline;' onclick='document.location.href="VDKeys.h.html#L12"; event.stopPropagation(); return false;'>VDKeys.h</td><td><pre><span class='linenumber' id=L12>0012&nbsp;</span>@<span class='identifier' entity=0>interface</span> <span class='XcClass identifier' entity=1><span class=highlighted id=selected cascade=1><span class=declaration>VDKeys</span></span></span> : <span class='XcClass identifier' entity=1><span class=highlighted id=selected cascade=1>NSObject</span></span> &lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchSUUpdaterDelegate</span></span>></pre></td></table></span></a></span>> <span line=19 col=62 offset=534 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#19:62 c:objc(pl)VDKSketchSUUpdaterProtocol(py)delegate Xcode.SourceCodeSymbolKind.Property 1" class='XcProperty identifier' entity=1><a style='color: inherit' name='L19' no_href='Sketch API_Protocols_Updater_VDKSketchSUUpdaterProtocol.h.html#L19'><span class=declaration>delegate</span></a></span>;
+<span class='linenumber' id=L20>0020&nbsp;</span>
+<span class='linenumber' id=L21>0021&nbsp;</span><span line=21 col=1 offset=545 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#21:1   -1" class='comment' entity=0>/*!
+<span class='linenumber' id=L22>0022&nbsp;</span> The shared updater for the main bundle.
+<span class='linenumber' id=L23>0023&nbsp;</span> 
+<span class='linenumber' id=L24>0024&nbsp;</span> This is equivalent to passing [NSBundle mainBundle] to SUUpdater::updaterForBundle:
+<span class='linenumber' id=L25>0025&nbsp;</span> */</span>
+<span class='linenumber' id=L26>0026&nbsp;</span>+ (<span line=26 col=4 offset=684 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#26:4   -1" class='identifier' entity=0>instancetype</span>)<span line=26 col=17 offset=697 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#26:17   -1" class='identifier' entity=0>sharedUpdater</span>;
+<span class='linenumber' id=L27>0027&nbsp;</span>
+<span class='linenumber' id=L28>0028&nbsp;</span><span line=28 col=1 offset=713 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#28:1   -1" class='comment' entity=0>/*!
+<span class='linenumber' id=L29>0029&nbsp;</span> The shared updater for a specified bundle.
+<span class='linenumber' id=L30>0030&nbsp;</span> 
+<span class='linenumber' id=L31>0031&nbsp;</span> If an updater has already been initialized for the provided bundle, that shared instance will be returned.
+<span class='linenumber' id=L32>0032&nbsp;</span> */</span>
+<span class='linenumber' id=L33>0033&nbsp;</span>+ (<span line=33 col=4 offset=878 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#33:4   -1" class='identifier' entity=0>instancetype</span>)<span line=33 col=17 offset=891 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#33:17   -1" class='identifier' entity=0>updaterForBundle</span>:(<span line=33 col=35 offset=909 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#33:35 c:objc(cs)NSBundle Xcode.SourceCodeSymbolKind.Class 4" class='XcClass identifier' entity=1>NSBundle</span> *)<span line=33 col=46 offset=920 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#33:46   -1" class='identifier' entity=0>bundle</span>;
+<span class='linenumber' id=L34>0034&nbsp;</span>
+<span class='linenumber' id=L35>0035&nbsp;</span><span line=35 col=1 offset=929 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#35:1   -1" class='comment' entity=0>/*!
+<span class='linenumber' id=L36>0036&nbsp;</span> Designated initializer for SUUpdater.
+<span class='linenumber' id=L37>0037&nbsp;</span> 
+<span class='linenumber' id=L38>0038&nbsp;</span> If an updater has already been initialized for the provided bundle, that shared instance will be returned.
+<span class='linenumber' id=L39>0039&nbsp;</span> */</span>
+<span class='linenumber' id=L40>0040&nbsp;</span>- (<span line=40 col=4 offset=1089 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#40:4   -1" class='identifier' entity=0>instancetype</span>)<span line=40 col=17 offset=1102 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#40:17   -1" class='identifier' entity=0>initForBundle</span>:(<span line=40 col=32 offset=1117 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#40:32 c:objc(cs)NSBundle Xcode.SourceCodeSymbolKind.Class 4" class='XcClass identifier' entity=1>NSBundle</span> *)<span line=40 col=43 offset=1128 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#40:43   -1" class='identifier' entity=0>bundle</span>;
+<span class='linenumber' id=L41>0041&nbsp;</span>
+<span class='linenumber' id=L42>0042&nbsp;</span><span line=42 col=1 offset=1137 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#42:1   -1" class='comment' entity=0>/*!
+<span class='linenumber' id=L43>0043&nbsp;</span> Explicitly checks for updates and displays a progress dialog while doing so.
+<span class='linenumber' id=L44>0044&nbsp;</span> 
+<span class='linenumber' id=L45>0045&nbsp;</span> This method is meant for a main menu item.
+<span class='linenumber' id=L46>0046&nbsp;</span> Connect any menu item to this action in Interface Builder,
+<span class='linenumber' id=L47>0047&nbsp;</span> and Sparkle will check for updates and report back its findings verbosely
+<span class='linenumber' id=L48>0048&nbsp;</span> when it is invoked.
+<span class='linenumber' id=L49>0049&nbsp;</span> 
+<span class='linenumber' id=L50>0050&nbsp;</span> This will find updates that the user has opted into skipping.
+<span class='linenumber' id=L51>0051&nbsp;</span> */</span>
+<span class='linenumber' id=L52>0052&nbsp;</span>- (<span line=52 col=4 offset=1493 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#52:4   -1" class='identifier' entity=0>IBAction</span>)<span line=52 col=13 offset=1502 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#52:13   -1" class='identifier' entity=0>checkForUpdates</span>:(<span line=52 col=30 offset=1519 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#52:30   -1" class='identifier' entity=0>id</span>)<span line=52 col=33 offset=1522 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#52:33   -1" class='identifier' entity=0>sender</span>;
+<span class='linenumber' id=L53>0053&nbsp;</span>
+<span class='linenumber' id=L54>0054&nbsp;</span><span line=54 col=1 offset=1531 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#54:1   -1" class='comment' entity=0>/*!
+<span class='linenumber' id=L55>0055&nbsp;</span> The menu item validation used for the -checkForUpdates: action
+<span class='linenumber' id=L56>0056&nbsp;</span> */</span>
+<span class='linenumber' id=L57>0057&nbsp;</span>- (<span line=57 col=4 offset=1606 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#57:4 c:@T@BOOL Xcode.SourceCodeSymbolKind.Typedef 4" class='XcTypedef identifier' entity=1>BOOL</span>)<span line=57 col=9 offset=1611 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#57:9   -1" class='identifier' entity=0>validateMenuItem</span>:(<span line=57 col=27 offset=1629 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#57:27 c:objc(cs)NSMenuItem Xcode.SourceCodeSymbolKind.Class 4" class='XcClass identifier' entity=1>NSMenuItem</span> *)<span line=57 col=40 offset=1642 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#57:40   -1" class='identifier' entity=0>menuItem</span>;
+<span class='linenumber' id=L58>0058&nbsp;</span>
+<span class='linenumber' id=L59>0059&nbsp;</span><span line=59 col=1 offset=1653 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#59:1   -1" class='comment' entity=0>/*!
+<span class='linenumber' id=L60>0060&nbsp;</span> Checks for updates, but does not display any UI unless an update is found.
+<span class='linenumber' id=L61>0061&nbsp;</span> 
+<span class='linenumber' id=L62>0062&nbsp;</span> This is meant for programmatically initating a check for updates. That is,
+<span class='linenumber' id=L63>0063&nbsp;</span> it will display no UI unless it actually finds an update, in which case it
+<span class='linenumber' id=L64>0064&nbsp;</span> proceeds as usual.
+<span class='linenumber' id=L65>0065&nbsp;</span> 
+<span class='linenumber' id=L66>0066&nbsp;</span> If automatic downloading of updates it turned on and allowed, however,
+<span class='linenumber' id=L67>0067&nbsp;</span> this will invoke that behavior, and if an update is found, it will be downloaded
+<span class='linenumber' id=L68>0068&nbsp;</span> in the background silently and will be prepped for installation.
+<span class='linenumber' id=L69>0069&nbsp;</span> 
+<span class='linenumber' id=L70>0070&nbsp;</span> This will not find updates that the user has opted into skipping.
+<span class='linenumber' id=L71>0071&nbsp;</span> */</span>
+<span class='linenumber' id=L72>0072&nbsp;</span>- (<span line=72 col=4 offset=2205 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#72:4   -1" class='identifier' entity=0>void</span>)<span line=72 col=9 offset=2210 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#72:9   -1" class='identifier' entity=0>checkForUpdatesInBackground</span>;
+<span class='linenumber' id=L73>0073&nbsp;</span>
+<span class='linenumber' id=L74>0074&nbsp;</span><span line=74 col=1 offset=2240 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#74:1   -1" class='comment' entity=0>/*!
+<span class='linenumber' id=L75>0075&nbsp;</span> A property indicating whether or not to check for updates automatically.
+<span class='linenumber' id=L76>0076&nbsp;</span> 
+<span class='linenumber' id=L77>0077&nbsp;</span> Setting this property will persist in the host bundle's user defaults.
+<span class='linenumber' id=L78>0078&nbsp;</span> The update schedule cycle will be reset in a short delay after the property's new value is set.
+<span class='linenumber' id=L79>0079&nbsp;</span> This is to allow reverting this property without kicking off a schedule change immediately
+<span class='linenumber' id=L80>0080&nbsp;</span> */</span>
+<span class='linenumber' id=L81>0081&nbsp;</span>@<span line=81 col=2 offset=2586 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#81:2   -1" class='identifier' entity=0>property</span> <span line=81 col=11 offset=2595 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#81:11 c:@T@BOOL Xcode.SourceCodeSymbolKind.Typedef 4" class='XcTypedef identifier' entity=1>BOOL</span> <span line=81 col=16 offset=2600 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#81:16 c:objc(pl)VDKSketchSUUpdaterProtocol(py)automaticallyChecksForUpdates Xcode.SourceCodeSymbolKind.Property 1" class='XcProperty identifier' entity=1><a style='color: inherit' name='L81' no_href='Sketch API_Protocols_Updater_VDKSketchSUUpdaterProtocol.h.html#L81'><span class=declaration>automaticallyChecksForUpdates</span></a></span>;
+<span class='linenumber' id=L82>0082&nbsp;</span>
+<span class='linenumber' id=L83>0083&nbsp;</span><span line=83 col=1 offset=2632 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#83:1   -1" class='comment' entity=0>/*!
+<span class='linenumber' id=L84>0084&nbsp;</span> A property indicating whether or not updates can be automatically downloaded in the background.
+<span class='linenumber' id=L85>0085&nbsp;</span> 
+<span class='linenumber' id=L86>0086&nbsp;</span> Note that automatic downloading of updates can be disallowed by the developer
+<span class='linenumber' id=L87>0087&nbsp;</span> or by the user's system if silent updates cannot be done (eg: if they require authentication).
+<span class='linenumber' id=L88>0088&nbsp;</span> In this case, -automaticallyDownloadsUpdates will return NO regardless of how this property is set.
+<span class='linenumber' id=L89>0089&nbsp;</span> 
+<span class='linenumber' id=L90>0090&nbsp;</span> Setting this property will persist in the host bundle's user defaults.
+<span class='linenumber' id=L91>0091&nbsp;</span> */</span>
+<span class='linenumber' id=L92>0092&nbsp;</span>@<span line=92 col=2 offset=3090 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#92:2   -1" class='identifier' entity=0>property</span> <span line=92 col=11 offset=3099 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#92:11 c:@T@BOOL Xcode.SourceCodeSymbolKind.Typedef 4" class='XcTypedef identifier' entity=1>BOOL</span> <span line=92 col=16 offset=3104 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#92:16 c:objc(pl)VDKSketchSUUpdaterProtocol(py)automaticallyDownloadsUpdates Xcode.SourceCodeSymbolKind.Property 1" class='XcProperty identifier' entity=1><a style='color: inherit' name='L92' no_href='Sketch API_Protocols_Updater_VDKSketchSUUpdaterProtocol.h.html#L92'><span class=declaration>automaticallyDownloadsUpdates</span></a></span>;
+<span class='linenumber' id=L93>0093&nbsp;</span>
+<span class='linenumber' id=L94>0094&nbsp;</span><span line=94 col=1 offset=3136 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#94:1   -1" class='comment' entity=0>/*!
+<span class='linenumber' id=L95>0095&nbsp;</span> A property indicating the current automatic update check interval.
+<span class='linenumber' id=L96>0096&nbsp;</span> 
+<span class='linenumber' id=L97>0097&nbsp;</span> Setting this property will persist in the host bundle's user defaults.
+<span class='linenumber' id=L98>0098&nbsp;</span> The update schedule cycle will be reset in a short delay after the property's new value is set.
+<span class='linenumber' id=L99>0099&nbsp;</span> This is to allow reverting this property without kicking off a schedule change immediately
+<span class='linenumber' id=L100>0100&nbsp;</span> */</span>
+<span class='linenumber' id=L101>0101&nbsp;</span>@<span line=101 col=2 offset=3476 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#101:2   -1" class='identifier' entity=0>property</span> <span line=101 col=11 offset=3485 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#101:11 c:@T@NSTimeInterval Xcode.SourceCodeSymbolKind.Typedef 4" class='XcTypedef identifier' entity=1>NSTimeInterval</span> <span line=101 col=26 offset=3500 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#101:26 c:objc(pl)VDKSketchSUUpdaterProtocol(py)updateCheckInterval Xcode.SourceCodeSymbolKind.Property 1" class='XcProperty identifier' entity=1><a style='color: inherit' name='L101' no_href='Sketch API_Protocols_Updater_VDKSketchSUUpdaterProtocol.h.html#L101'><span class=declaration>updateCheckInterval</span></a></span>;
+<span class='linenumber' id=L102>0102&nbsp;</span>
+<span class='linenumber' id=L103>0103&nbsp;</span><span line=103 col=1 offset=3522 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#103:1   -1" class='comment' entity=0>/*!
+<span class='linenumber' id=L104>0104&nbsp;</span> Begins a "probing" check for updates which will not actually offer to
+<span class='linenumber' id=L105>0105&nbsp;</span> update to that version.
+<span class='linenumber' id=L106>0106&nbsp;</span> 
+<span class='linenumber' id=L107>0107&nbsp;</span> However, the delegate methods
+<span class='linenumber' id=L108>0108&nbsp;</span> SUUpdaterDelegate::updater:didFindValidUpdate: and
+<span class='linenumber' id=L109>0109&nbsp;</span> SUUpdaterDelegate::updaterDidNotFindUpdate: will be called,
+<span class='linenumber' id=L110>0110&nbsp;</span> so you can use that information in your UI.
+<span class='linenumber' id=L111>0111&nbsp;</span> 
+<span class='linenumber' id=L112>0112&nbsp;</span> Updates that have been skipped by the user will not be found.
+<span class='linenumber' id=L113>0113&nbsp;</span> */</span>
+<span class='linenumber' id=L114>0114&nbsp;</span>- (<span line=114 col=4 offset=3885 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#114:4   -1" class='identifier' entity=0>void</span>)<span line=114 col=9 offset=3890 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#114:9   -1" class='identifier' entity=0>checkForUpdateInformation</span>;
+<span class='linenumber' id=L115>0115&nbsp;</span>
+<span class='linenumber' id=L116>0116&nbsp;</span><span line=116 col=1 offset=3918 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#116:1   -1" class='comment' entity=0>/*!
+<span class='linenumber' id=L117>0117&nbsp;</span> The URL of the appcast used to download update information.
+<span class='linenumber' id=L118>0118&nbsp;</span> 
+<span class='linenumber' id=L119>0119&nbsp;</span> Setting this property will persist in the host bundle's user defaults.
+<span class='linenumber' id=L120>0120&nbsp;</span> If you don't want persistence, you may want to consider instead implementing
+<span class='linenumber' id=L121>0121&nbsp;</span> SUUpdaterDelegate::feedURLStringForUpdater: or SUUpdaterDelegate::feedParametersForUpdater:sendingSystemProfile:
+<span class='linenumber' id=L122>0122&nbsp;</span> 
+<span class='linenumber' id=L123>0123&nbsp;</span> This property must be called on the main thread.
+<span class='linenumber' id=L124>0124&nbsp;</span> */</span>
+<span class='linenumber' id=L125>0125&nbsp;</span>@<span line=125 col=2 offset=4306 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#125:2   -1" class='identifier' entity=0>property</span> (<span line=125 col=12 offset=4316 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#125:12   -1" class='identifier' entity=0>copy</span>) <span line=125 col=18 offset=4322 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#125:18 c:objc(cs)NSURL Xcode.SourceCodeSymbolKind.Class 4" class='XcClass identifier' entity=1>NSURL</span> *<span line=125 col=25 offset=4329 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#125:25 c:objc(pl)VDKSketchSUUpdaterProtocol(py)feedURL Xcode.SourceCodeSymbolKind.Property 1" class='XcProperty identifier' entity=1><a style='color: inherit' name='L125' no_href='Sketch API_Protocols_Updater_VDKSketchSUUpdaterProtocol.h.html#L125'><span class=declaration>feedURL</span></a></span>;
+<span class='linenumber' id=L126>0126&nbsp;</span>
+<span class='linenumber' id=L127>0127&nbsp;</span><span line=127 col=1 offset=4339 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#127:1   -1" class='comment' entity=0>/*!
+<span class='linenumber' id=L128>0128&nbsp;</span> The host bundle that is being updated.
+<span class='linenumber' id=L129>0129&nbsp;</span> */</span>
+<span class='linenumber' id=L130>0130&nbsp;</span>@<span line=130 col=2 offset=4388 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#130:2   -1" class='identifier' entity=0>property</span> (<span line=130 col=12 offset=4398 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#130:12   -1" class='identifier' entity=0>readonly</span>, <span line=130 col=22 offset=4408 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#130:22   -1" class='identifier' entity=0>strong</span>) <span line=130 col=30 offset=4416 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#130:30 c:objc(cs)NSBundle Xcode.SourceCodeSymbolKind.Class 4" class='XcClass identifier' entity=1>NSBundle</span> *<span line=130 col=40 offset=4426 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#130:40 c:objc(pl)VDKSketchSUUpdaterProtocol(py)hostBundle Xcode.SourceCodeSymbolKind.Property 1" class='XcProperty identifier' entity=1><a style='color: inherit' name='L130' no_href='Sketch API_Protocols_Updater_VDKSketchSUUpdaterProtocol.h.html#L130'><span class=declaration>hostBundle</span></a></span>;
+<span class='linenumber' id=L131>0131&nbsp;</span>
+<span class='linenumber' id=L132>0132&nbsp;</span><span line=132 col=1 offset=4439 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#132:1   -1" class='comment' entity=0>/*!
+<span class='linenumber' id=L133>0133&nbsp;</span> The bundle this class (SUUpdater) is loaded into.
+<span class='linenumber' id=L134>0134&nbsp;</span> */</span>
+<span class='linenumber' id=L135>0135&nbsp;</span>@<span line=135 col=2 offset=4499 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#135:2   -1" class='identifier' entity=0>property</span> (<span line=135 col=12 offset=4509 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#135:12   -1" class='identifier' entity=0>strong</span>, <span line=135 col=20 offset=4517 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#135:20   -1" class='identifier' entity=0>readonly</span>) <span line=135 col=30 offset=4527 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#135:30 c:objc(cs)NSBundle Xcode.SourceCodeSymbolKind.Class 4" class='XcClass identifier' entity=1>NSBundle</span> *<span line=135 col=40 offset=4537 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#135:40 c:objc(pl)VDKSketchSUUpdaterProtocol(py)sparkleBundle Xcode.SourceCodeSymbolKind.Property 1" class='XcProperty identifier' entity=1><a style='color: inherit' name='L135' no_href='Sketch API_Protocols_Updater_VDKSketchSUUpdaterProtocol.h.html#L135'><span class=declaration>sparkleBundle</span></a></span>;
+<span class='linenumber' id=L136>0136&nbsp;</span>
+<span class='linenumber' id=L137>0137&nbsp;</span><span line=137 col=1 offset=4553 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#137:1   -1" class='comment' entity=0>/*!
+<span class='linenumber' id=L138>0138&nbsp;</span> The user agent used when checking for updates.
+<span class='linenumber' id=L139>0139&nbsp;</span> 
+<span class='linenumber' id=L140>0140&nbsp;</span> The default implementation can be overrided.
+<span class='linenumber' id=L141>0141&nbsp;</span> */</span>
+<span class='linenumber' id=L142>0142&nbsp;</span>@<span line=142 col=2 offset=4658 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#142:2   -1" class='identifier' entity=0>property</span> (<span line=142 col=12 offset=4668 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#142:12   -1" class='identifier' entity=0>nonatomic</span>, <span line=142 col=23 offset=4679 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#142:23   -1" class='identifier' entity=0>copy</span>) <span line=142 col=29 offset=4685 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#142:29 c:objc(cs)NSString Xcode.SourceCodeSymbolKind.Class 4" class='XcClass identifier' entity=1>NSString</span> *<span line=142 col=39 offset=4695 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#142:39 c:objc(pl)VDKSketchSUUpdaterProtocol(py)userAgentString Xcode.SourceCodeSymbolKind.Property 1" class='XcProperty identifier' entity=1><a style='color: inherit' name='L142' no_href='Sketch API_Protocols_Updater_VDKSketchSUUpdaterProtocol.h.html#L142'><span class=declaration>userAgentString</span></a></span>;
+<span class='linenumber' id=L143>0143&nbsp;</span>
+<span class='linenumber' id=L144>0144&nbsp;</span><span line=144 col=1 offset=4713 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#144:1   -1" class='comment' entity=0>/*!
+<span class='linenumber' id=L145>0145&nbsp;</span> The HTTP headers used when checking for updates.
+<span class='linenumber' id=L146>0146&nbsp;</span> 
+<span class='linenumber' id=L147>0147&nbsp;</span> The keys of this dictionary are HTTP header fields (NSString) and values are corresponding values (NSString)
+<span class='linenumber' id=L148>0148&nbsp;</span> */</span>
+<span class='linenumber' id=L149>0149&nbsp;</span>@<span line=149 col=2 offset=4884 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#149:2   -1" class='identifier' entity=0>property</span> (<span line=149 col=12 offset=4894 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#149:12   -1" class='identifier' entity=0>copy</span>) <span line=149 col=18 offset=4900 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#149:18 c:objc(cs)NSDictionary Xcode.SourceCodeSymbolKind.Class 4" class='XcClass identifier' entity=1>NSDictionary</span> *<span line=149 col=32 offset=4914 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#149:32 c:objc(pl)VDKSketchSUUpdaterProtocol(py)httpHeaders Xcode.SourceCodeSymbolKind.Property 1" class='XcProperty identifier' entity=1><a style='color: inherit' name='L149' no_href='Sketch API_Protocols_Updater_VDKSketchSUUpdaterProtocol.h.html#L149'><span class=declaration>httpHeaders</span></a></span>;
+<span class='linenumber' id=L150>0150&nbsp;</span>
+<span class='linenumber' id=L151>0151&nbsp;</span><span line=151 col=1 offset=4928 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#151:1   -1" class='comment' entity=0>/*!
+<span class='linenumber' id=L152>0152&nbsp;</span> A property indicating whether or not the user's system profile information is sent when checking for updates.
+<span class='linenumber' id=L153>0153&nbsp;</span> 
+<span class='linenumber' id=L154>0154&nbsp;</span> Setting this property will persist in the host bundle's user defaults.
+<span class='linenumber' id=L155>0155&nbsp;</span> */</span>
+<span class='linenumber' id=L156>0156&nbsp;</span>@<span line=156 col=2 offset=5122 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#156:2   -1" class='identifier' entity=0>property</span> <span line=156 col=11 offset=5131 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#156:11 c:@T@BOOL Xcode.SourceCodeSymbolKind.Typedef 4" class='XcTypedef identifier' entity=1>BOOL</span> <span line=156 col=16 offset=5136 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#156:16 c:objc(pl)VDKSketchSUUpdaterProtocol(py)sendsSystemProfile Xcode.SourceCodeSymbolKind.Property 1" class='XcProperty identifier' entity=1><a style='color: inherit' name='L156' no_href='Sketch API_Protocols_Updater_VDKSketchSUUpdaterProtocol.h.html#L156'><span class=declaration>sendsSystemProfile</span></a></span>;
+<span class='linenumber' id=L157>0157&nbsp;</span>
+<span class='linenumber' id=L158>0158&nbsp;</span><span line=158 col=1 offset=5157 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#158:1   -1" class='comment' entity=0>/*!
+<span class='linenumber' id=L159>0159&nbsp;</span> A property indicating the decryption password used for extracting updates shipped as Apple Disk Images (dmg)
+<span class='linenumber' id=L160>0160&nbsp;</span> */</span>
+<span class='linenumber' id=L161>0161&nbsp;</span>@<span line=161 col=2 offset=5276 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#161:2   -1" class='identifier' entity=0>property</span> (<span line=161 col=12 offset=5286 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#161:12   -1" class='identifier' entity=0>nonatomic</span>, <span line=161 col=23 offset=5297 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#161:23   -1" class='identifier' entity=0>copy</span>) <span line=161 col=29 offset=5303 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#161:29 c:objc(cs)NSString Xcode.SourceCodeSymbolKind.Class 4" class='XcClass identifier' entity=1>NSString</span> *<span line=161 col=39 offset=5313 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#161:39 c:objc(pl)VDKSketchSUUpdaterProtocol(py)decryptionPassword Xcode.SourceCodeSymbolKind.Property 1" class='XcProperty identifier' entity=1><a style='color: inherit' name='L161' no_href='Sketch API_Protocols_Updater_VDKSketchSUUpdaterProtocol.h.html#L161'><span class=declaration>decryptionPassword</span></a></span>;
+<span class='linenumber' id=L162>0162&nbsp;</span>
+<span class='linenumber' id=L163>0163&nbsp;</span><span line=163 col=1 offset=5334 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#163:1   -1" class='comment' entity=0>/*!
+<span class='linenumber' id=L164>0164&nbsp;</span> Checks for updates and, if available, immediately downloads and installs them.
+<span class='linenumber' id=L165>0165&nbsp;</span> A progress dialog is shown but the user will never be prompted to read the
+<span class='linenumber' id=L166>0166&nbsp;</span> release notes.
+<span class='linenumber' id=L167>0167&nbsp;</span> 
+<span class='linenumber' id=L168>0168&nbsp;</span> You may want to respond to the userDidCancelDownload delegate method in case
+<span class='linenumber' id=L169>0169&nbsp;</span> the user clicks the "Cancel" button while the update is downloading.
+<span class='linenumber' id=L170>0170&nbsp;</span> 
+<span class='linenumber' id=L171>0171&nbsp;</span> If you are writing a UI-less background application, you probably want to instead use
+<span class='linenumber' id=L172>0172&nbsp;</span> SUUpdaterDelegate::updater:willInstallUpdateOnQuit:immediateInstallationInvocation:
+<span class='linenumber' id=L173>0173&nbsp;</span> */</span>
+<span class='linenumber' id=L174>0174&nbsp;</span>- (<span line=174 col=4 offset=5841 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#174:4   -1" class='identifier' entity=0>void</span>)<span line=174 col=9 offset=5846 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#174:9   -1" class='identifier' entity=0>installUpdatesIfAvailable</span>;
+<span class='linenumber' id=L175>0175&nbsp;</span>
+<span class='linenumber' id=L176>0176&nbsp;</span><span line=176 col=1 offset=5874 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#176:1   -1" class='comment' entity=0>/*!
+<span class='linenumber' id=L177>0177&nbsp;</span> Returns the date of last update check.
+<span class='linenumber' id=L178>0178&nbsp;</span> 
+<span class='linenumber' id=L179>0179&nbsp;</span> \returns \c nil if no check has been performed.
+<span class='linenumber' id=L180>0180&nbsp;</span> */</span>
+<span class='linenumber' id=L181>0181&nbsp;</span>@<span line=181 col=2 offset=5974 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#181:2   -1" class='identifier' entity=0>property</span> (<span line=181 col=12 offset=5984 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#181:12   -1" class='identifier' entity=0>readonly</span>, <span line=181 col=22 offset=5994 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#181:22   -1" class='identifier' entity=0>copy</span>) <span line=181 col=28 offset=6000 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#181:28 c:objc(cs)NSDate Xcode.SourceCodeSymbolKind.Class 4" class='XcClass identifier' entity=1>NSDate</span> *<span line=181 col=36 offset=6008 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#181:36 c:objc(pl)VDKSketchSUUpdaterProtocol(py)lastUpdateCheckDate Xcode.SourceCodeSymbolKind.Property 1" class='XcProperty identifier' entity=1><a style='color: inherit' name='L181' no_href='Sketch API_Protocols_Updater_VDKSketchSUUpdaterProtocol.h.html#L181'><span class=declaration>lastUpdateCheckDate</span></a></span>;
+<span class='linenumber' id=L182>0182&nbsp;</span>
+<span class='linenumber' id=L183>0183&nbsp;</span><span line=183 col=1 offset=6030 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#183:1   -1" class='comment' entity=0>/*!
+<span class='linenumber' id=L184>0184&nbsp;</span> Appropriately schedules or cancels the update checking timer according to
+<span class='linenumber' id=L185>0185&nbsp;</span> the preferences for time interval and automatic checks.
+<span class='linenumber' id=L186>0186&nbsp;</span> 
+<span class='linenumber' id=L187>0187&nbsp;</span> This call does not change the date of the next check,
+<span class='linenumber' id=L188>0188&nbsp;</span> but only the internal NSTimer.
+<span class='linenumber' id=L189>0189&nbsp;</span> */</span>
+<span class='linenumber' id=L190>0190&nbsp;</span>- (<span line=190 col=4 offset=6262 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#190:4   -1" class='identifier' entity=0>void</span>)<span line=190 col=9 offset=6267 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#190:9   -1" class='identifier' entity=0>resetUpdateCycle</span>;
+<span class='linenumber' id=L191>0191&nbsp;</span>
+<span class='linenumber' id=L192>0192&nbsp;</span><span line=192 col=1 offset=6286 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#192:1   -1" class='comment' entity=0>/*!
+<span class='linenumber' id=L193>0193&nbsp;</span> A property indicating whether or not an update is in progress.
+<span class='linenumber' id=L194>0194&nbsp;</span> 
+<span class='linenumber' id=L195>0195&nbsp;</span> Note this property is not indicative of whether or not user initiated updates can be performed.
+<span class='linenumber' id=L196>0196&nbsp;</span> Use SUUpdater::validateMenuItem: for that instead.
+<span class='linenumber' id=L197>0197&nbsp;</span> */</span>
+<span class='linenumber' id=L198>0198&nbsp;</span>@<span line=198 col=2 offset=6510 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#198:2   -1" class='identifier' entity=0>property</span> (<span line=198 col=12 offset=6520 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#198:12   -1" class='identifier' entity=0>readonly</span>) <span line=198 col=22 offset=6530 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#198:22 c:@T@BOOL Xcode.SourceCodeSymbolKind.Typedef 4" class='XcTypedef identifier' entity=1>BOOL</span> <span line=198 col=27 offset=6535 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#198:27 c:objc(pl)VDKSketchSUUpdaterProtocol(py)updateInProgress Xcode.SourceCodeSymbolKind.Property 1" class='XcProperty identifier' entity=1><a style='color: inherit' name='L198' no_href='Sketch API_Protocols_Updater_VDKSketchSUUpdaterProtocol.h.html#L198'><span class=declaration>updateInProgress</span></a></span>;
+<span class='linenumber' id=L199>0199&nbsp;</span>
+<span class='linenumber' id=L200>0200&nbsp;</span>@<span line=200 col=2 offset=6555 title="Sketch API/Protocols/Updater/VDKSketchSUUpdaterProtocol.h#200:2   -1" class='identifier' entity=0>end</span>
+<span class='linenumber' id=L201>0201&nbsp;</span>

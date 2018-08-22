@@ -1,0 +1,6 @@
+framework module Pods_KeysForSketch {
+  umbrella header "Pods-KeysForSketch-umbrella.h"
+
+  export *
+  module * { export * }
+}

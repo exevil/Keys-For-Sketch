@@ -1,0 +1,237 @@
+<html><head><meta charset="utf-8"/><style>
+
+body, table { font: 10pt Menlo Regular; }
+
+.builtin  { color: #A90D91; }
+.comment  { color: #10743E; }
+.url  { color: blue; }
+.doccomment { color: #10743E; }
+.identifier { color: #3F6E74; }
+.keyword { color: #AD0D91; }
+.number { color: #1D26E1; }
+.string { color: #CB444D; }
+.typeidentifier { color: #5C2599; }
+
+.XcAttention { }
+.XcBinding { }
+.XcBuiltinType { }
+.XcCallable { }
+.XcCategory { color: blue; }
+.XcClass { color: blue; }
+.XcClassMethod { color: darkgreen; }
+.XcClassMethodTemplate {  color: darkgreen; }
+.XcClassProperty { color: darkred; }
+.XcClassTemplate { color: blue; }
+.XcClassVariable { color: darkred; }
+.XcContainer { }
+.XcEnum { color: #e68a00; }
+.XcEnumConstant { color: #e68a00; }
+.XcExtension { color: cyan; }
+.XcField { color: darkred; }
+.XcFixMe {}
+.XcFunction { color: darkgreen; }
+.XcFunctionTemplate { color: darkgreen; }
+.XcGKInspectableProperty {}
+.XcGlobal { color: darkred; }
+.XcGlobalVariable { color: darkred; }
+.XcIBActionMethod { color: brown; }
+.XcIBOutlet { color: brown; }
+.XcIBOutletCollection { color: brown; }
+.XcIBOutletCollectionProperty { color: brown; }
+.XcIBOutletCollectionVariable { color: brown; }
+.XcIBOutletProperty { color: brown; }
+.XcIBOutletVariable { color: brown; }
+.XcInstanceMethod { color: darkgreen; }
+.XcInstanceMethodTemplate { color: darkgreen; }
+.XcInstanceVariable { color: darkred; }
+.XcLocalVariable { }
+.XcMacro {}
+.XcMark {}
+.XcMember {}
+.XcMemberContainer {}
+.XcNamespace {}
+.XcParameter {}
+.XcProperty { color: darkred; }
+.XcProtocol { color: purple; }
+.XcQuestion {}
+.XcStaticMethod { color: darkgreen; }
+.XcStaticProperty { color: darkred; }
+.XcStruct { color: #5858ff; }
+/* .XcSwift.Struct */
+.XcTestMethod { }
+.XcToDo {}
+.XcTypedef {}
+.XcUnion  {}
+
+pre.#source { font-family: -apple-system; }
+span#selected { }
+span.highlighted { font-weight: bold; }
+.declaration { font-style: italic; }
+
+div.changesHeader { font-weight: bold; padding-bottom: 8px; }
+
+div.error { font-weight: bold; }
+div.log { }
+div.usr { padding-bottom: 8px; }
+
+div.changesEntry { padding-top: 4px; padding-bottom: 8px; }
+a.sourceLink { background-color: #e8e8e8; }
+span.linenumber { color: darkgrey; }
+span.covered { border-right: 2px inset green; }
+
+div.applying { }
+span.oldValue { color: red; }
+span.newValue { color: green; }
+
+/* HTML extract */
+
+span.references { display: none; position: absolute; border: 2px outset; z-index: 100; }
+span.references table { background-color: white; }
+span.references table tr td { border: 1px inset; font: 10pt Courier New; }
+span.references table tr.decl td { font-style: italic; }
+
+div.filelist { font-family: -apple-system; font-size: 12pt; }
+div.filelist a { margin: 4px; }
+
+</style><script>
+
+var boldened, source
+
+function setSource( html ) {
+    if ( !source )
+        source = document.getElementById("source")
+
+    if ( source.children.length )
+        source.children[0].style.display = "none"
+
+    var div = document.createElement("div")
+    div.innerHTML = html
+    source.insertBefore(div,source.children[0])
+
+    boldened = null
+
+    var selected = document.getElementById( "selected" )
+    if ( selected ) {
+        scrollTo( 0, selected.offsetTop-window.innerHeight/3 )
+        if ( selected.getAttribute("cascade") != 0 )
+            searchSelected( selected, 0, 1 )
+        else
+            getSelection().setBaseAndExtent(selected, 0, selected, 1)
+    }
+    else
+        scrollTo( 0, 0 )
+
+    window.onmouseup = function() {
+        searchSelected( event.srcElement, event.metaKey, 0, 1 )
+        event.cancelBubble = true
+    }
+}
+
+function appendSource( path, filtered ) {
+    var span = document.createElement("span")
+    span.innerHTML = filtered
+    span.title = path
+    source.children[0].appendChild(span)
+}
+
+function searchSelected( span, meta, cascade, click ) {
+    var innerSpan = span
+    while ( span && !span.getAttribute("line") )
+        span = span.parentElement
+
+    if ( span ) {
+
+        if ( window.appController && (span.getAttribute("entity") != 0 || cascade) ) {
+            getSelection().setBaseAndExtent(span, 0, span, 1)
+
+            if ( boldened )
+                boldened.style.fontWeight = "normal"
+            boldened = innerSpan
+            if ( !cascade )
+                boldened.style.fontWeight = "bold"
+
+            if ( span.getAttribute("entity") != 0 )
+                appController.selectedWithText_title_line_col_offset_metaKey_( span.innerText, span.title,
+                    span.getAttribute("line"), span.getAttribute("col"), span.getAttribute("offset"), meta )
+        }
+
+        if ( window.appController2 && click ) {
+            getSelection().setBaseAndExtent(span, 0, span, 1)
+            appController2.changeSelectedWithText_title_line_col_offset_metaKey_( span.innerText, span.title,
+                span.getAttribute("line"), span.getAttribute("col"), span.getAttribute("offset"), meta )
+        }
+    }
+}
+
+function gotoFile( file, line ) {
+    appController2.gotoWithFile_line_( file, line )
+    return false
+}
+
+function gotoLine( line ) {
+    var label = document.getElementById( "L"+line )
+    label.style.color = "red"
+    scrollTo( 0, label.offsetTop-window.innerHeight/3 )
+}
+
+var lastlink;
+
+function expand(a, metaKey) {
+    if ( metaKey )
+        return true
+    var last = a.children.length-1
+    if ( a.children[last].style.display != "block" ) {
+        if ( lastlink )
+            lastlink.style.display = "none";
+        a.children[last].style.display = "block";
+        lastlink = a.children[last];
+    }
+    else {
+        a.children[last].style.display = "none";
+        lastlink = null;
+    }
+    return false;
+}
+
+</script></head>
+<body><pre id="source">
+<span class='linenumber' id=L1>0001&nbsp;</span><span line=1 col=1 offset=0 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#1:1   -1" class='comment' entity=0>//
+<span class='linenumber' id=L2>0002&nbsp;</span></span><span line=2 col=1 offset=3 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#2:1   -1" class='comment' entity=0>//  VDKSketchMSPluginBundleProtocol.h
+<span class='linenumber' id=L3>0003&nbsp;</span></span><span line=3 col=1 offset=41 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#3:1   -1" class='comment' entity=0>//  KeysForSketch
+<span class='linenumber' id=L4>0004&nbsp;</span></span><span line=4 col=1 offset=59 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#4:1   -1" class='comment' entity=0>//
+<span class='linenumber' id=L5>0005&nbsp;</span></span><span line=5 col=1 offset=62 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#5:1   -1" class='comment' entity=0>//  Created by Vyacheslav Dubovitsky on 22/03/2017.
+<span class='linenumber' id=L6>0006&nbsp;</span></span><span line=6 col=1 offset=114 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#6:1   -1" class='comment' entity=0>//  Copyright © 2017 Vyacheslav Dubovitsky. All rights reserved.
+<span class='linenumber' id=L7>0007&nbsp;</span></span><span line=7 col=1 offset=180 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#7:1   -1" class='comment' entity=0>//
+<span class='linenumber' id=L8>0008&nbsp;</span></span>
+<span class='linenumber' id=L9>0009&nbsp;</span>#<span line=9 col=2 offset=185 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#9:2   -1" class='keyword' entity=0>import</span> &lt;<span line=9 col=10 offset=193 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#9:10   -1" class='identifier' entity=0>Foundation</span>/<span line=9 col=21 offset=204 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#9:21   -1" class='identifier' entity=0>Foundation</span>.<span line=9 col=32 offset=215 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#9:32   -1" class='identifier' entity=0>h</span>>
+<span class='linenumber' id=L10>0010&nbsp;</span>
+<span class='linenumber' id=L11>0011&nbsp;</span>@<span line=11 col=2 offset=220 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#11:2   -1" class='keyword' entity=0>protocol</span> <span line=11 col=11 offset=229 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#11:11 c:objc(pl)VDKSketchMSPluginBundleProtocol Xcode.SourceCodeSymbolKind.Protocol 1" class='XcProtocol identifier' entity=1><a style='color: inherit' name='L11' href='Sketch API_Protocols_VDKSketchMSPluginBundleProtocol.h.html#L11' target=_self onclick='return expand(this, event.metaKey);'><span class=declaration>VDKSketchMSPluginBundleProtocol</span><span class='references'><table><tr><td style='text-decoration: underline;' onclick='document.location.href="Sketch API_VDKSketchAPI.h.html#L36"; event.stopPropagation(); return false;'>VDKSketchAPI.h</td><td><pre><span class='linenumber' id=L36>0036&nbsp;</span>+ (<span class='identifier' entity=0>nonnull</span> <span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol identifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchMSPluginBundleProtocol</span></span>>)<span class='identifier' entity=0>pluginBundleWithURL</span>:(<span class='identifier' entity=0>nonnull</span> <span class='XcClass identifier' entity=1><span class=highlighted id=selected cascade=1>NSURL</span></span> *)<span class='identifier' entity=0>url</span>;</pre></td><tr><td style='text-decoration: underline;' onclick='document.location.href="Sketch API_VDKSketchAPI.m.html#L43"; event.stopPropagation(); return false;'>VDKSketchAPI.m</td><td><pre><span class='linenumber' id=L43>0043&nbsp;</span>+ (<span class='identifier' entity=0>nonnull</span> <span class='identifier' entity=0>id</span>&lt;<span class='XcProtocol typeidentifier' entity=1><span class=highlighted id=selected cascade=1>VDKSketchMSPluginBundleProtocol</span></span>>)<span class='identifier' entity=0>pluginBundleWithURL</span>:(<span class='XcClass identifier' entity=1><span class=highlighted id=selected cascade=1>NSURL</span></span> *)<span class='identifier' entity=0>url</span> {</pre></td></table></span></a></span> &lt;<span line=11 col=44 offset=262 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#11:44 c:objc(pl)NSObject Xcode.SourceCodeSymbolKind.Protocol 3" class='XcProtocol identifier' entity=1>NSObject</span>>
+<span class='linenumber' id=L12>0012&nbsp;</span>
+<span class='linenumber' id=L13>0013&nbsp;</span>+ (<span line=13 col=4 offset=276 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#13:4   -1" class='identifier' entity=0>id</span>)<span line=13 col=7 offset=279 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#13:7   -1" class='identifier' entity=0>commandsFromArray</span>:(<span line=13 col=26 offset=298 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#13:26   -1" class='identifier' entity=0>id</span>)<span line=13 col=29 offset=301 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#13:29   -1" class='identifier' entity=0>arg1</span> <span line=13 col=34 offset=306 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#13:34   -1" class='identifier' entity=0>sketchPluginURL</span>:(<span line=13 col=51 offset=323 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#13:51   -1" class='identifier' entity=0>id</span>)<span line=13 col=54 offset=326 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#13:54   -1" class='identifier' entity=0>arg2</span> <span line=13 col=59 offset=331 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#13:59   -1" class='identifier' entity=0>pluginBundle</span>:(<span line=13 col=73 offset=345 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#13:73   -1" class='identifier' entity=0>id</span>)<span line=13 col=76 offset=348 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#13:76   -1" class='identifier' entity=0>arg3</span>;
+<span class='linenumber' id=L14>0014&nbsp;</span>+ (<span line=14 col=4 offset=357 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#14:4   -1" class='identifier' entity=0>id</span>)<span line=14 col=7 offset=360 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#14:7   -1" class='identifier' entity=0>pluginBundleWithURL</span>:(<span line=14 col=28 offset=381 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#14:28   -1" class='identifier' entity=0>id</span>)<span line=14 col=31 offset=384 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#14:31   -1" class='identifier' entity=0>arg1</span>;
+<span class='linenumber' id=L15>0015&nbsp;</span>@<span line=15 col=2 offset=391 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#15:2   -1" class='identifier' entity=0>property</span>(<span line=15 col=11 offset=400 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#15:11   -1" class='identifier' entity=0>nonatomic</span>) <span line=15 col=22 offset=411 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#15:22 c:@T@BOOL Xcode.SourceCodeSymbolKind.Typedef 4" class='XcTypedef identifier' entity=1>BOOL</span> <span line=15 col=27 offset=416 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#15:27 c:objc(pl)VDKSketchMSPluginBundleProtocol(py)disableCocoaScriptPreprocessor Xcode.SourceCodeSymbolKind.Property 1" class='XcProperty identifier' entity=1><a style='color: inherit' name='L15' no_href='Sketch API_Protocols_VDKSketchMSPluginBundleProtocol.h.html#L15'><span class=declaration>disableCocoaScriptPreprocessor</span></a></span>; <span line=15 col=59 offset=448 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#15:59   -1" class='comment' entity=0>// @synthesize disableCocoaScriptPreprocessor=_disableCocoaScriptPreprocessor;
+<span class='linenumber' id=L16>0016&nbsp;</span></span>@<span line=16 col=2 offset=528 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#16:2   -1" class='identifier' entity=0>property</span>(<span line=16 col=11 offset=537 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#16:11   -1" class='identifier' entity=0>nonatomic</span>, <span line=16 col=22 offset=548 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#16:22   -1" class='identifier' entity=0>getter</span>=<span line=16 col=29 offset=555 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#16:29   -1" class='identifier' entity=0>isEnabled</span>) <span line=16 col=40 offset=566 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#16:40 c:@T@BOOL Xcode.SourceCodeSymbolKind.Typedef 4" class='XcTypedef identifier' entity=1>BOOL</span> <span line=16 col=45 offset=571 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#16:45 c:objc(pl)VDKSketchMSPluginBundleProtocol(py)enabled Xcode.SourceCodeSymbolKind.Property 1" class='XcProperty identifier' entity=1><a style='color: inherit' name='L16' no_href='Sketch API_Protocols_VDKSketchMSPluginBundleProtocol.h.html#L16'><span class=declaration>enabled</span></a></span>; <span line=16 col=54 offset=580 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#16:54   -1" class='comment' entity=0>// @synthesize enabled=_enabled;
+<span class='linenumber' id=L17>0017&nbsp;</span></span>@<span line=17 col=2 offset=614 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#17:2   -1" class='identifier' entity=0>property</span>(<span line=17 col=11 offset=623 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#17:11   -1" class='identifier' entity=0>nonatomic</span>, <span line=17 col=22 offset=634 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#17:22   -1" class='identifier' entity=0>getter</span>=<span line=17 col=29 offset=641 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#17:29   -1" class='identifier' entity=0>isLegacyPlugin</span>) <span line=17 col=45 offset=657 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#17:45 c:@T@BOOL Xcode.SourceCodeSymbolKind.Typedef 4" class='XcTypedef identifier' entity=1>BOOL</span> <span line=17 col=50 offset=662 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#17:50 c:objc(pl)VDKSketchMSPluginBundleProtocol(py)legacyPlugin Xcode.SourceCodeSymbolKind.Property 1" class='XcProperty identifier' entity=1><a style='color: inherit' name='L17' no_href='Sketch API_Protocols_VDKSketchMSPluginBundleProtocol.h.html#L17'><span class=declaration>legacyPlugin</span></a></span>; <span line=17 col=64 offset=676 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#17:64   -1" class='comment' entity=0>// @synthesize legacyPlugin=_legacyPlugin;
+<span class='linenumber' id=L18>0018&nbsp;</span></span>@<span line=18 col=2 offset=720 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#18:2   -1" class='identifier' entity=0>property</span>(<span line=18 col=11 offset=729 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#18:11   -1" class='identifier' entity=0>readonly</span>, <span line=18 col=21 offset=739 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#18:21   -1" class='identifier' entity=0>copy</span>, <span line=18 col=27 offset=745 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#18:27   -1" class='identifier' entity=0>nonatomic</span>) <span line=18 col=38 offset=756 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#18:38 c:objc(cs)NSString Xcode.SourceCodeSymbolKind.Class 4" class='XcClass identifier' entity=1>NSString</span> *<span line=18 col=48 offset=766 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#18:48 c:objc(pl)VDKSketchMSPluginBundleProtocol(py)compatibleVersion Xcode.SourceCodeSymbolKind.Property 1" class='XcProperty identifier' entity=1><a style='color: inherit' name='L18' no_href='Sketch API_Protocols_VDKSketchMSPluginBundleProtocol.h.html#L18'><span class=declaration>compatibleVersion</span></a></span>; <span line=18 col=67 offset=785 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#18:67   -1" class='comment' entity=0>// @synthesize compatibleVersion=_compatibleVersion;
+<span class='linenumber' id=L19>0019&nbsp;</span></span>@<span line=19 col=2 offset=839 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#19:2   -1" class='identifier' entity=0>property</span>(<span line=19 col=11 offset=848 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#19:11   -1" class='identifier' entity=0>readonly</span>, <span line=19 col=21 offset=858 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#19:21   -1" class='identifier' entity=0>copy</span>, <span line=19 col=27 offset=864 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#19:27   -1" class='identifier' entity=0>nonatomic</span>) <span line=19 col=38 offset=875 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#19:38 c:objc(cs)NSURL Xcode.SourceCodeSymbolKind.Class 4" class='XcClass identifier' entity=1>NSURL</span> *<span line=19 col=45 offset=882 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#19:45 c:objc(pl)VDKSketchMSPluginBundleProtocol(py)downloadURL Xcode.SourceCodeSymbolKind.Property 1" class='XcProperty identifier' entity=1><a style='color: inherit' name='L19' no_href='Sketch API_Protocols_VDKSketchMSPluginBundleProtocol.h.html#L19'><span class=declaration>downloadURL</span></a></span>; <span line=19 col=58 offset=895 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#19:58   -1" class='comment' entity=0>// @synthesize downloadURL=_downloadURL;
+<span class='linenumber' id=L20>0020&nbsp;</span></span>@<span line=20 col=2 offset=937 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#20:2   -1" class='identifier' entity=0>property</span>(<span line=20 col=11 offset=946 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#20:11   -1" class='identifier' entity=0>readonly</span>, <span line=20 col=21 offset=956 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#20:21   -1" class='identifier' entity=0>copy</span>, <span line=20 col=27 offset=962 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#20:27   -1" class='identifier' entity=0>nonatomic</span>) <span line=20 col=38 offset=973 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#20:38 c:objc(cs)NSURL Xcode.SourceCodeSymbolKind.Class 4" class='XcClass identifier' entity=1>NSURL</span> *<span line=20 col=45 offset=980 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#20:45 c:objc(pl)VDKSketchMSPluginBundleProtocol(py)manifestURL Xcode.SourceCodeSymbolKind.Property 1" class='XcProperty identifier' entity=1><a style='color: inherit' name='L20' no_href='Sketch API_Protocols_VDKSketchMSPluginBundleProtocol.h.html#L20'><span class=declaration>manifestURL</span></a></span>; <span line=20 col=58 offset=993 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#20:58   -1" class='comment' entity=0>// @synthesize manifestURL=_manifestURL;
+<span class='linenumber' id=L21>0021&nbsp;</span></span>@<span line=21 col=2 offset=1035 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#21:2   -1" class='identifier' entity=0>property</span>(<span line=21 col=11 offset=1044 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#21:11   -1" class='identifier' entity=0>readonly</span>, <span line=21 col=21 offset=1054 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#21:21   -1" class='identifier' entity=0>copy</span>, <span line=21 col=27 offset=1060 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#21:27   -1" class='identifier' entity=0>nonatomic</span>) <span line=21 col=38 offset=1071 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#21:38 c:objc(cs)NSString Xcode.SourceCodeSymbolKind.Class 4" class='XcClass identifier' entity=1>NSString</span> *<span line=21 col=48 offset=1081 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#21:48 c:objc(pl)VDKSketchMSPluginBundleProtocol(py)authorEmail Xcode.SourceCodeSymbolKind.Property 1" class='XcProperty identifier' entity=1><a style='color: inherit' name='L21' no_href='Sketch API_Protocols_VDKSketchMSPluginBundleProtocol.h.html#L21'><span class=declaration>authorEmail</span></a></span>; <span line=21 col=61 offset=1094 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#21:61   -1" class='comment' entity=0>// @synthesize authorEmail=_authorEmail;
+<span class='linenumber' id=L22>0022&nbsp;</span></span>@<span line=22 col=2 offset=1136 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#22:2   -1" class='identifier' entity=0>property</span>(<span line=22 col=11 offset=1145 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#22:11   -1" class='identifier' entity=0>readonly</span>, <span line=22 col=21 offset=1155 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#22:21   -1" class='identifier' entity=0>copy</span>, <span line=22 col=27 offset=1161 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#22:27   -1" class='identifier' entity=0>nonatomic</span>) <span line=22 col=38 offset=1172 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#22:38 c:objc(cs)NSString Xcode.SourceCodeSymbolKind.Class 4" class='XcClass identifier' entity=1>NSString</span> *<span line=22 col=48 offset=1182 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#22:48 c:objc(pl)VDKSketchMSPluginBundleProtocol(py)author Xcode.SourceCodeSymbolKind.Property 1" class='XcProperty identifier' entity=1><a style='color: inherit' name='L22' no_href='Sketch API_Protocols_VDKSketchMSPluginBundleProtocol.h.html#L22'><span class=declaration>author</span></a></span>; <span line=22 col=56 offset=1190 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#22:56   -1" class='comment' entity=0>// @synthesize author=_author;
+<span class='linenumber' id=L23>0023&nbsp;</span></span>@<span line=23 col=2 offset=1222 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#23:2   -1" class='identifier' entity=0>property</span>(<span line=23 col=11 offset=1231 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#23:11   -1" class='identifier' entity=0>readonly</span>, <span line=23 col=21 offset=1241 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#23:21   -1" class='identifier' entity=0>copy</span>, <span line=23 col=27 offset=1247 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#23:27   -1" class='identifier' entity=0>nonatomic</span>) <span line=23 col=38 offset=1258 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#23:38 c:objc(cs)NSURL Xcode.SourceCodeSymbolKind.Class 4" class='XcClass identifier' entity=1>NSURL</span> *<span line=23 col=45 offset=1265 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#23:45 c:objc(pl)VDKSketchMSPluginBundleProtocol(py)homepageURL Xcode.SourceCodeSymbolKind.Property 1" class='XcProperty identifier' entity=1><a style='color: inherit' name='L23' no_href='Sketch API_Protocols_VDKSketchMSPluginBundleProtocol.h.html#L23'><span class=declaration>homepageURL</span></a></span>; <span line=23 col=58 offset=1278 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#23:58   -1" class='comment' entity=0>// @synthesize homepageURL=_homepageURL;
+<span class='linenumber' id=L24>0024&nbsp;</span></span>@<span line=24 col=2 offset=1320 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#24:2   -1" class='identifier' entity=0>property</span>(<span line=24 col=11 offset=1329 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#24:11   -1" class='identifier' entity=0>copy</span>, <span line=24 col=17 offset=1335 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#24:17   -1" class='identifier' entity=0>nonatomic</span>) <span line=24 col=28 offset=1346 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#24:28 c:objc(cs)NSDictionary Xcode.SourceCodeSymbolKind.Class 4" class='XcClass identifier' entity=1>NSDictionary</span> *<span line=24 col=42 offset=1360 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#24:42 c:objc(pl)VDKSketchMSPluginBundleProtocol(py)menuDescription Xcode.SourceCodeSymbolKind.Property 1" class='XcProperty identifier' entity=1><a style='color: inherit' name='L24' no_href='Sketch API_Protocols_VDKSketchMSPluginBundleProtocol.h.html#L24'><span class=declaration>menuDescription</span></a></span>; <span line=24 col=59 offset=1377 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#24:59   -1" class='comment' entity=0>// @synthesize menuDescription=_menuDescription;
+<span class='linenumber' id=L25>0025&nbsp;</span></span>@<span line=25 col=2 offset=1427 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#25:2   -1" class='identifier' entity=0>property</span>(<span line=25 col=11 offset=1436 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#25:11   -1" class='identifier' entity=0>readonly</span>, <span line=25 col=21 offset=1446 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#25:21   -1" class='identifier' entity=0>copy</span>, <span line=25 col=27 offset=1452 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#25:27   -1" class='identifier' entity=0>nonatomic</span>) <span line=25 col=38 offset=1463 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#25:38 c:objc(cs)NSString Xcode.SourceCodeSymbolKind.Class 4" class='XcClass identifier' entity=1>NSString</span> *<span line=25 col=48 offset=1473 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#25:48 c:objc(pl)VDKSketchMSPluginBundleProtocol(py)pluginDescription Xcode.SourceCodeSymbolKind.Property 1" class='XcProperty identifier' entity=1><a style='color: inherit' name='L25' no_href='Sketch API_Protocols_VDKSketchMSPluginBundleProtocol.h.html#L25'><span class=declaration>pluginDescription</span></a></span>; <span line=25 col=67 offset=1492 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#25:67   -1" class='comment' entity=0>// @synthesize pluginDescription=_pluginDescription;
+<span class='linenumber' id=L26>0026&nbsp;</span></span>@<span line=26 col=2 offset=1546 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#26:2   -1" class='identifier' entity=0>property</span>(<span line=26 col=11 offset=1555 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#26:11   -1" class='identifier' entity=0>readonly</span>, <span line=26 col=21 offset=1565 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#26:21   -1" class='identifier' entity=0>copy</span>, <span line=26 col=27 offset=1571 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#26:27   -1" class='identifier' entity=0>nonatomic</span>) <span line=26 col=38 offset=1582 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#26:38 c:objc(cs)NSString Xcode.SourceCodeSymbolKind.Class 4" class='XcClass identifier' entity=1>NSString</span> *<span line=26 col=48 offset=1592 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#26:48 c:objc(pl)VDKSketchMSPluginBundleProtocol(py)identifier Xcode.SourceCodeSymbolKind.Property 1" class='XcProperty identifier' entity=1><a style='color: inherit' name='L26' no_href='Sketch API_Protocols_VDKSketchMSPluginBundleProtocol.h.html#L26'><span class=declaration>identifier</span></a></span>; <span line=26 col=60 offset=1604 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#26:60   -1" class='comment' entity=0>// @synthesize identifier=_identifier;
+<span class='linenumber' id=L27>0027&nbsp;</span></span>@<span line=27 col=2 offset=1644 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#27:2   -1" class='identifier' entity=0>property</span>(<span line=27 col=11 offset=1653 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#27:11   -1" class='identifier' entity=0>readonly</span>, <span line=27 col=21 offset=1663 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#27:21   -1" class='identifier' entity=0>copy</span>, <span line=27 col=27 offset=1669 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#27:27   -1" class='identifier' entity=0>nonatomic</span>) <span line=27 col=38 offset=1680 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#27:38 c:objc(cs)NSString Xcode.SourceCodeSymbolKind.Class 4" class='XcClass identifier' entity=1>NSString</span> *<span line=27 col=48 offset=1690 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#27:48 c:objc(pl)VDKSketchMSPluginBundleProtocol(py)name Xcode.SourceCodeSymbolKind.Property 1" class='XcProperty identifier' entity=1><a style='color: inherit' name='L27' no_href='Sketch API_Protocols_VDKSketchMSPluginBundleProtocol.h.html#L27'><span class=declaration>name</span></a></span>; <span line=27 col=54 offset=1696 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#27:54   -1" class='comment' entity=0>// @synthesize name=_name;
+<span class='linenumber' id=L28>0028&nbsp;</span></span>@<span line=28 col=2 offset=1724 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#28:2   -1" class='identifier' entity=0>property</span>(<span line=28 col=11 offset=1733 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#28:11   -1" class='identifier' entity=0>readonly</span>, <span line=28 col=21 offset=1743 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#28:21   -1" class='identifier' entity=0>copy</span>, <span line=28 col=27 offset=1749 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#28:27   -1" class='identifier' entity=0>nonatomic</span>) <span line=28 col=38 offset=1760 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#28:38 c:objc(cs)NSString Xcode.SourceCodeSymbolKind.Class 4" class='XcClass identifier' entity=1>NSString</span> *<span line=28 col=48 offset=1770 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#28:48 c:objc(pl)VDKSketchMSPluginBundleProtocol(py)version Xcode.SourceCodeSymbolKind.Property 1" class='XcProperty identifier' entity=1><a style='color: inherit' name='L28' no_href='Sketch API_Protocols_VDKSketchMSPluginBundleProtocol.h.html#L28'><span class=declaration>version</span></a></span>; <span line=28 col=57 offset=1779 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#28:57   -1" class='comment' entity=0>// @synthesize version=_version;
+<span class='linenumber' id=L29>0029&nbsp;</span></span>@<span line=29 col=2 offset=1813 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#29:2   -1" class='identifier' entity=0>property</span>(<span line=29 col=11 offset=1822 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#29:11   -1" class='identifier' entity=0>readonly</span>, <span line=29 col=21 offset=1832 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#29:21   -1" class='identifier' entity=0>copy</span>, <span line=29 col=27 offset=1838 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#29:27   -1" class='identifier' entity=0>nonatomic</span>) <span line=29 col=38 offset=1849 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#29:38 c:objc(cs)NSDictionary Xcode.SourceCodeSymbolKind.Class 4" class='XcClass identifier' entity=1>NSDictionary</span> *<span line=29 col=52 offset=1863 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#29:52 c:objc(pl)VDKSketchMSPluginBundleProtocol(py)commands Xcode.SourceCodeSymbolKind.Property 1" class='XcProperty identifier' entity=1><a style='color: inherit' name='L29' no_href='Sketch API_Protocols_VDKSketchMSPluginBundleProtocol.h.html#L29'><span class=declaration>commands</span></a></span>; <span line=29 col=62 offset=1873 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#29:62   -1" class='comment' entity=0>// @synthesize commands=_commands;
+<span class='linenumber' id=L30>0030&nbsp;</span></span>@<span line=30 col=2 offset=1909 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#30:2   -1" class='identifier' entity=0>property</span>(<span line=30 col=11 offset=1918 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#30:11   -1" class='identifier' entity=0>readonly</span>, <span line=30 col=21 offset=1928 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#30:21   -1" class='identifier' entity=0>copy</span>, <span line=30 col=27 offset=1934 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#30:27   -1" class='identifier' entity=0>nonatomic</span>) <span line=30 col=38 offset=1945 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#30:38 c:objc(cs)NSURL Xcode.SourceCodeSymbolKind.Class 4" class='XcClass identifier' entity=1>NSURL</span> *<span line=30 col=45 offset=1952 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#30:45 c:objc(pl)VDKSketchMSPluginBundleProtocol(py)url Xcode.SourceCodeSymbolKind.Property 1" class='XcProperty identifier' entity=1><a style='color: inherit' name='L30' no_href='Sketch API_Protocols_VDKSketchMSPluginBundleProtocol.h.html#L30'><span class=declaration>url</span></a></span>; <span line=30 col=50 offset=1957 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#30:50   -1" class='comment' entity=0>// @synthesize url=_url;
+<span class='linenumber' id=L31>0031&nbsp;</span></span><span class=declaration>- (</span><span line=31 col=4 offset=1985 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#31:4   -1" class='identifier' entity=0>id</span>)<span line=31 col=7 offset=1988 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#31:7   -1" class='identifier' entity=0>debugDescription</span>;
+<span class='linenumber' id=L32>0032&nbsp;</span>- (<span line=32 col=4 offset=2009 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#32:4   -1" class='identifier' entity=0>id</span>)<span line=32 col=7 offset=2012 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#32:7   -1" class='identifier' entity=0>urlForResourceNamed</span>:(<span line=32 col=28 offset=2033 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#32:28   -1" class='identifier' entity=0>id</span>)<span line=32 col=31 offset=2036 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#32:31   -1" class='identifier' entity=0>arg1</span>;
+<span class='linenumber' id=L33>0033&nbsp;</span>- (<span line=33 col=4 offset=2045 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#33:4 c:@T@BOOL Xcode.SourceCodeSymbolKind.Typedef 4" class='XcTypedef identifier' entity=1>BOOL</span>)<span line=33 col=9 offset=2050 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#33:9   -1" class='identifier' entity=0>writeToURL</span>:(<span line=33 col=21 offset=2062 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#33:21   -1" class='identifier' entity=0>id</span>)<span line=33 col=24 offset=2065 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#33:24   -1" class='identifier' entity=0>arg1</span>;
+<span class='linenumber' id=L34>0034&nbsp;</span>- (<span line=34 col=4 offset=2074 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#34:4   -1" class='identifier' entity=0>id</span>)<span line=34 col=7 offset=2077 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#34:7   -1" class='identifier' entity=0>metadata</span>;
+<span class='linenumber' id=L35>0035&nbsp;</span>- (<span line=35 col=4 offset=2090 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#35:4   -1" class='identifier' entity=0>id</span>)<span line=35 col=7 offset=2093 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#35:7   -1" class='identifier' entity=0>initWithName</span>:(<span line=35 col=21 offset=2107 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#35:21   -1" class='identifier' entity=0>id</span>)<span line=35 col=24 offset=2110 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#35:24   -1" class='identifier' entity=0>arg1</span> <span line=35 col=29 offset=2115 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#35:29   -1" class='identifier' entity=0>identifier</span>:(<span line=35 col=41 offset=2127 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#35:41   -1" class='identifier' entity=0>id</span>)<span line=35 col=44 offset=2130 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#35:44   -1" class='identifier' entity=0>arg2</span> <span line=35 col=49 offset=2135 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#35:49   -1" class='identifier' entity=0>commands</span>:(<span line=35 col=59 offset=2145 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#35:59   -1" class='identifier' entity=0>id</span>)<span line=35 col=62 offset=2148 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#35:62   -1" class='identifier' entity=0>arg3</span>;
+<span class='linenumber' id=L36>0036&nbsp;</span>- (<span line=36 col=4 offset=2157 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#36:4   -1" class='identifier' entity=0>id</span>)<span line=36 col=7 offset=2160 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#36:7   -1" class='identifier' entity=0>initLegacyPluginWithURL</span>:(<span line=36 col=32 offset=2185 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#36:32   -1" class='identifier' entity=0>id</span>)<span line=36 col=35 offset=2188 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#36:35   -1" class='identifier' entity=0>arg1</span>;
+<span class='linenumber' id=L37>0037&nbsp;</span>- (<span line=37 col=4 offset=2197 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#37:4   -1" class='identifier' entity=0>id</span>)<span line=37 col=7 offset=2200 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#37:7   -1" class='identifier' entity=0>initPluginBundleWithURL</span>:(<span line=37 col=32 offset=2225 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#37:32   -1" class='identifier' entity=0>id</span>)<span line=37 col=35 offset=2228 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#37:35   -1" class='identifier' entity=0>arg1</span>;
+<span class='linenumber' id=L38>0038&nbsp;</span>
+<span class='linenumber' id=L39>0039&nbsp;</span>@<span line=39 col=2 offset=2236 title="Sketch API/Protocols/VDKSketchMSPluginBundleProtocol.h#39:2   -1" class='identifier' entity=0>end</span>
+<span class='linenumber' id=L40>0040&nbsp;</span>
